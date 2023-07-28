@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ product.name }}</title>
+    <!-- Include CSS styles here -->
+</head>
+<body>
+    <header>
+        <!-- Header content -->
+    </header>
+
+    <div class="container">
+        <!-- Display product details -->
+        <h2>{{ product.name }}</h2>
+        <p>Price: ${{ product.price }}</p>
+        <p>Category: {{ product.category.name }}</p>
+        <div>{{ product.description|safe }}</div>
+        <!-- Add image here -->
+
+        <!-- Display related products -->
+        <h3>Related Products</h3>
+        <div class="related-products">
+            {% for related_product in related_products %}
+                <div class="related-product">
+                    <h4>{{ related_product.name }}</h4>
+                    <p>Price: ${{ related_product.price }}</p>
+                    <a href="{% url 'product_detail' related_product.id %}">View Details</a>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Add product reviews and ratings here -->
+
+    </div>
+
+    <!-- Add footer here -->
+
+</body>
+</html>

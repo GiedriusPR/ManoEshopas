@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} - My E-Shop{% endblock %}
+
+{% block content %}
+  <h2>{{ category.name }}</h2>
+
+  {% for product in products %}
+    <div class="product">
+      <h3>{{ product.name }}</h3>
+      <p>Price: ${{ product.price }}</p>
+<a href="{% url 'eshopas_app:product_detail' product.id %}">View Details</a>
+    </div>
+  {% endfor %}
+{% endblock %}

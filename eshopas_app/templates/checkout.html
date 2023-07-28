@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+    <h2>Checkout</h2>
+    <p>Total: ${{ total_cart_value }}</p>
+    <form method="post">
+        {% csrf_token %}
+        <label for="card_number">Card Number:</label>
+        <input type="text" id="card_number" name="card_number" required>
+        <label for="expiry_date">Expiry Date:</label>
+        <input type="text" id="expiry_date" name="expiry_date" required>
+        <label for="cvv">CVV:</label>
+        <input type="text" id="cvv" name="cvv" required>
+        <button type="submit">Place Order</button>
+    </form>
+{% endblock %}
