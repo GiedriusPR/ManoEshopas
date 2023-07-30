@@ -1,39 +1,42 @@
 <!DOCTYPE html>
 {% load static %}
-<html>
+{% load myfilters %}
+<link href="{% static 'css/styles.css' %}" rel="stylesheet">
+
+<html lang="en">
 <head>
-    <title>Your Site Title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eshop</title>
     <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-
-    <!-- Navigation bar -->
-    <div class="navbar">
-        <a href="{% url 'index' %}">Home</a>
-        <a href="{% url 'category' %}">Category</a> <!-- link to category page -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand btn btn-primary" href="/">Eshop</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav mr-auto">
+            <a class="nav-item nav-link btn btn-primary" href="/category/">Categories</a>
+            {% if user.is_authenticated %}
+                <a class="nav-item nav-link" href="/profile/">Profile</a>
+                <a class="nav-item nav-link" href="/logout/">Logout</a>
+            {% else %}
+                <a class="nav-item nav-link" href="/login/">Login</a>
+                <a class="nav-item nav-link" href="/register/">Register</a>
+            {% endif %}
+        </div>
         {% if user.is_authenticated %}
-            <a href="{% url 'logout' %}">Logout</a>
+            <a class="nav-item nav-link ml-auto" href="/cart-detail/">Cart ({{ request.session.cart|cart_total }})</a>
         {% else %}
-         <a href="{% url 'login' %}">Login</a>
-         <a href="{% url 'register' %}">Register</a>
+            <a class="nav-item nav-link ml-auto" href="/cart-detail/">Cart (0)</a>
         {% endif %}
-        <a href="{% url 'cart' %}">Cart ({% if cart_items %}{{ cart_items|length }}{% else %}0{% endif %})</a>
     </div>
-
-
-    <!-- Content block -->
-    <div class="content">
-        {% block content %}
-        {% endblock %}
+</nav>
+    <div class="container">
+      {% block content %}
+      {% endblock %}
     </div>
-
-<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
-<script>
-    tinymce.init({
-        selector: 'textarea',
-        // other options...
-    });
-</script>
-
 </body>
 </html>

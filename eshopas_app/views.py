@@ -8,15 +8,13 @@ from django.contrib.auth.decorators import login_required
 import logging
 from django.core.paginator import Paginator
 from .forms import UserUpdateForm, ProfileUpdateForm
-
-
-
-
+from django.views import View
+import json
 
 logger = logging.getLogger(__name__)
 
 def index(request):
-    products = Product.objects.all()  # Show all products
+    products = Product.objects.all()
     categories = Category.objects.all()
 
     # Get cart information
@@ -30,15 +28,14 @@ def index(request):
     page_obj = paginator.get_page(page_number)
 
     context = {
-        'products': page_obj,  # Use 'products' instead of 'featured_products'
+        'products': page_obj,
         'categories': categories,
         'cart_items': products_in_cart,
         'total_cart_value': total_cart_value,
         'user': request.user,
     }
 
-    return render(request, 'index.html', context)  # Send the 'context' variable, not just the user
-
+    return render(request, 'index.html', context)
 
 def category(request):
     categories = Category.objects.all()
@@ -102,13 +99,13 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.info(request, f"You are now logged in as {username}.")
-                return redirect('index')  # Replace 'home' with the name of your homepage URL pattern
+                return redirect('index')  # Replace 'index' with the name of your homepage URL pattern
             else:
-                messages.error(request,"Invalid username or password.")
+                messages.error(request, "Invalid username or password.")
         else:
-            messages.error(request,"Invalid username or password.")
+            messages.error(request, "Invalid username or password.")
     form = AuthenticationForm()
-    return render(request=request, template_name="eshopas_app/login.html", context={"login_form":form})
+    return render(request=request, template_name="eshopas_app/login.html", context={"login_form": form})
 
 
 def logout_view(request):
@@ -158,3 +155,38 @@ def profile_view(request):
     }
 
     return render(request, 'profile.html', context)
+
+class CategoryListView(View):
+    def get(self, request):
+        categories = Category.objects.all()
+        context = {'categories': categories}
+        return render(request, 'category_list.html', context)
+
+def cart_detail(request):
+    # Your view logic here...
+    return render(request, 'cart_detail.html')
+
+def get_product_by_id(product_id):
+    pass
+
+def add_to_cart(request, product_id):
+    # Your existing logic to get the product and add it to the cart
+    # For example:
+    product = get_product_by_id(product_id)
+    if product is None:
+        # Handle the case where the product does not exist
+        return redirect('product_not_found')
+
+    # Assuming you have a 'cart' variable that represents the cart data
+    # Your logic to add the product to the cart
+    cart = request.session.get('cart', {})
+    cart[product_id] = {
+        'name': product.name,
+        'price': product.price,
+        'quantity': 1,  # Or update the quantity if the product already exists in the cart
+    }
+
+    # Serialize the cart data to JSON before setting it in the session
+    request.session['cart'] = json.dumps(cart)
+
+    return redirect('cart_detail')

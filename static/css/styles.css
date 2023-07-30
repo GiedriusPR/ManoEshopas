@@ -65,6 +65,7 @@ form .form-group {
 
 form label {
     display: block;
+    font-size: 20px;
 }
 
 form input[type="text"],
@@ -89,4 +90,50 @@ button {
 
 button:hover {
     background-color: #258473;
+}
+
+.navbar-text {
+    margin-right: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    text-align: left;
+    padding: 15px;
+}
+
+th {
+    background-color: #50a8a0;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.quantity-input {
+    width: 50px;
+}
+
+.cart-total {
+    font-size: 24px;
+    margin: 20px 0;
+    text-align: right;
+}
+
+.cart-buttons {
+    text-align: right;
+}
+
+.cart-buttons button {
+    margin: 5px;
 }
