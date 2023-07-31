@@ -12,26 +12,21 @@
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand btn btn-primary" href="/">Eshop</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav mr-auto">
-            <a class="nav-item nav-link btn btn-primary" href="/category/">Categories</a>
-            {% if user.is_authenticated %}
-                <a class="nav-item nav-link" href="/profile/">Profile</a>
-                <a class="nav-item nav-link" href="/logout/">Logout</a>
-            {% else %}
-                <a class="nav-item nav-link" href="/login/">Login</a>
-                <a class="nav-item nav-link" href="/register/">Register</a>
-            {% endif %}
+    <div class="container">
+        <a class="navbar-brand btn btn-primary" href="/">Eshop</a>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav ml-auto">
+                <a class="nav-item nav-link btn btn-primary" href="/category/">Categories</a>
+                {% if user.is_authenticated %}
+                    <a class="nav-item nav-link btn btn-primary" href="/profile/">Profile</a>
+                    <a class="nav-item nav-link btn btn-primary" href="/logout/">Logout</a>
+                {% else %}
+                    <a class="nav-item nav-link btn btn-primary" href="/login/">Login</a>
+                    <a class="nav-item nav-link btn btn-primary" href="/register/">Register</a>
+                {% endif %}
+                <a class="nav-item nav-link btn btn-primary" href="/cart-detail/">Cart ({{ request.session.cart|cart_total }})</a>
+            </div>
         </div>
-        {% if user.is_authenticated %}
-            <a class="nav-item nav-link ml-auto" href="/cart-detail/">Cart ({{ request.session.cart|cart_total }})</a>
-        {% else %}
-            <a class="nav-item nav-link ml-auto" href="/cart-detail/">Cart (0)</a>
-        {% endif %}
     </div>
 </nav>
     <div class="container">
