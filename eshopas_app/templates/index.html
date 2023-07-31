@@ -6,16 +6,11 @@
 {% block content %}
     <h2>Welcome to My E-Shop</h2>
 
-{% if user.is_authenticated %}
-    <p>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</p>
-{% else %}
-    <p>Welcome, Guest!</p>
-{% endif %}
-
-    <!-- Display cart information -->
-    <h3>Cart Information</h3>
-    <p>Number of items in cart: {{ cart_items|length }}</p>
-    <p>Total cart value: ${{ total_cart_value|floatformat:2 }}</p>
+    {% if user.is_authenticated %}
+        <p>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</p>
+    {% else %}
+        <p>Welcome, Guest!</p>
+    {% endif %}
 
     <!-- Display products -->
     <h3>Products</h3>
@@ -28,7 +23,7 @@
                         <h5 class="card-title">{{ product.name }}</h5>
                         <p class="card-text">Price: ${{ product.price|floatformat:2 }}</p>
                         <a href="{% url 'product_detail' product.id %}" class="btn btn-primary">View Details</a>
-                        <form method="post" action="{% url 'cart' %}" class="add-to-cart-form" data-product-id="{{ product.id }}">
+                        <form method="post" action="{% url 'cart' %}">
                             {% csrf_token %}
                             <input type="hidden" name="product_id" value="{{ product.id }}">
                             <button type="submit" class="btn btn-primary">Add to Cart</button>
@@ -61,26 +56,4 @@
         {% endif %}
       </ul>
     </nav>
-
-    <script>
-        // Handle form submission and prevent redirection
-        const addCartForms = document.querySelectorAll('.add-to-cart-form');
-        addCartForms.forEach((form) => {
-            form.addEventListener('submit', (event) => {
-                event.preventDefault();
-                const productId = form.getAttribute('data-product-id');
-                const formData = new FormData(form);
-                formData.append('product_id', productId);
-                fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                }).then(() => {
-                    // Reload the page to update cart information
-                    location.reload();
-                }).catch((error) => {
-                    console.error('Error:', error);
-                });
-            });
-        });
-    </script>
 {% endblock %}

@@ -12,6 +12,8 @@ from django.views import View
 import json
 from .templatetags.myfilters import cart_total
 from .cart import Cart
+from django.http import HttpResponse
+from django.http import JsonResponse
 
 
 logger = logging.getLogger(__name__)
@@ -33,7 +35,7 @@ def index(request):
     context = {
         'products': page_obj,
         'categories': categories,
-        'cart_items': products_in_cart,
+        'cart_items_count': len(cart_items),  # Update the cart count here
         'total_cart_value': total_cart_value,
         'user': request.user,
     }
@@ -80,6 +82,12 @@ def cart(request):
     }
 
     return render(request, 'cart.html', context)
+
+@login_required()
+def cart_count(request):
+    cart_items = request.session.get('cart_items', [])
+    return JsonResponse({'count': len(cart_items)})
+
 
 @login_required
 def checkout_view(request):
