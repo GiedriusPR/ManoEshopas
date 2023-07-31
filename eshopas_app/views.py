@@ -11,6 +11,8 @@ from .forms import UserUpdateForm, ProfileUpdateForm
 from django.views import View
 import json
 from .templatetags.myfilters import cart_total
+from .cart import Cart
+
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +40,7 @@ def index(request):
 
     return render(request, 'index.html', context)
 
+
 def category(request):
     categories = Category.objects.all()
     return render(request, 'category.html', {'categories': categories})
@@ -53,8 +56,9 @@ def product_detail(request, product_id):
 
 @login_required
 def cart(request):
-    cart_items = request.session.get('cart_items', [])
-    products = Product.objects.filter(id__in=cart_items)
+    cart = Cart(request)
+    cart_items = cart.get_cart_items()
+    total_price = cart.get_total_price()
 
     if request.method == 'POST':
         form = CartForm(request.POST)
@@ -62,15 +66,20 @@ def cart(request):
             product_id = form.cleaned_data['product_id']
             product = get_object_or_404(Product, id=product_id)
 
-            cart_items.append(product.id)
-            request.session['cart_items'] = cart_items
+            cart.add(product)
 
             # Redirect to the cart page after adding the item
             return redirect('cart')
     else:
         form = CartForm()
 
-    return render(request, 'cart.html', {'form': form, 'products': products})
+    context = {
+        'form': form,
+        'cart_items': cart_items,
+        'total_price': total_price,
+    }
+
+    return render(request, 'cart.html', context)
 
 @login_required
 def checkout_view(request):
@@ -164,56 +173,26 @@ class CategoryListView(View):
         return render(request, 'category_list.html', context)
 
 @login_required
-def cart_detail(request):
-    cart_items = request.session.get('cart_items', [])
-    products_in_cart = Product.objects.filter(id__in=cart_items)
-    total_cart_value = sum([product.price for product in products_in_cart])
-
-    return render(request, 'cart_detail.html', {'products': products_in_cart, 'total_cart_value': total_cart_value})
-
-    cart_items = []
-
-    for product_id, details in cart.items():
-        product = get_product_by_id(product_id)
-        if product:
-            item = {
-                'product': product,
-                'quantity': details.get('quantity', 0),
-                'price': details.get('price', 0),
-                'total': int(details.get('quantity', 0)) * float(details.get('price', 0))
-            }
-            cart_items.append(item)
-
-    context = {
-        'cart_items': cart_items,
-        'total_cart_value': cart_total(cart)
-    }
-
-    return render(request, 'cart_detail.html', context)
-
-def get_product_by_id(product_id):
-    pass
-
-
 def add_to_cart(request, product_id):
-    # Your existing logic to get the product and add it to the cart
-    # For example:
-    product = get_object_or_404(Product, id=product_id)
-    if product is None:
-        # Handle the case where the product does not exist
-        return redirect('product_not_found')
+    product = get_product_by_id(product_id)
+    if product:
+        cart = Cart(request)
+        cart.add(product=product)
+    return redirect('cart_detail')
 
-    # Assuming you have a 'cart' variable that represents the cart data
-    # Your logic to add the product to the cart
-    cart = request.session.get('cart', {})  # Get the current cart or create an empty one if it doesn't exist
-    cart[product_id] = {
-        'name': product.name,
-        'price': str(product.price),  # Convert the price to a string to avoid JSON serialization issues
-        'quantity': 1,  # Or update the quantity if the product already exists in the cart
-    }
+@login_required
+def cart_detail(request):
+    cart = Cart(request)
+    cart_items = cart.get_cart_items()
+    total_cart_value = cart.get_total_price()
 
-    # Serialize the cart data to JSON before setting it in the session
-    request.session['cart'] = json.dumps(cart)
+    return render(request, 'cart_detail.html', {'cart_items': cart_items, 'total_cart_value': total_cart_value})
 
-    return redirect('cart_detail')  # Redirect to the cart_detail page after adding the item
 
+@login_required
+def get_product_by_id(product_id):
+    try:
+        product = Product.objects.get(pk=product_id)
+    except Product.DoesNotExist:
+        product = None
+    return product
