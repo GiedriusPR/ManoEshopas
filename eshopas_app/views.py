@@ -1,20 +1,20 @@
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Category, Product, Customer, ProductOrder, Review, Orders, User_login, ProductComment
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .forms import UserRegistrationForm, CartForm
-from django.contrib.auth.decorators import login_required
-import logging
 from django.core.paginator import Paginator
-from .forms import UserUpdateForm, ProfileUpdateForm
 from django.views import View
-import json
+from django.http import HttpResponse, JsonResponse
+from django.contrib.auth import authenticate, login, logout
+import logging
+from .models import (
+    Category, Product, Customer, ProductOrder, Review, Orders, User_login, ProductComment
+)
+from .forms import (
+    UserRegistrationForm, CartForm, UserUpdateForm, ProfileUpdateForm, ProductCommentForm
+)
 from .templatetags.myfilters import cart_total
 from .cart import Cart
-from django.http import HttpResponse
-from django.http import JsonResponse
-from .forms import ProductCommentForm
 
 logger = logging.getLogger(__name__)
 
@@ -76,11 +76,10 @@ def cart(request):
         if form.is_valid():
             product_id = form.cleaned_data['product_id']
             product = get_object_or_404(Product, id=product_id)
-
             cart.add(product)
-
             # Redirect to the cart page after adding the item
             return redirect('cart')
+
     else:
         form = CartForm()
 
@@ -194,22 +193,6 @@ class CategoryListView(View):
 def cart_detail(request):
     cart = Cart(request)
     cart_items = cart.get_cart_items()
-    cart_quantity = cart_items.count()
-    total_cart_value = cart.get_total_price()  # Calculate the total cart value
-
-    context = {
-        'cart_items': cart_items,
-        'cart_quantity': cart_quantity,
-        'total_cart_value': total_cart_value,  # Include the correct total cart value in the context
-    }
-
-    return render(request, 'cart_detail.html', context)
-
-
-@login_required
-def cart_detail(request):
-    cart = Cart(request)
-    cart_items = cart.get_cart_items()
     total_cart_value = cart.get_total_price()
 
     return render(request, 'cart_detail.html', {'cart_items': cart_items, 'total_cart_value': total_cart_value})
@@ -239,3 +222,24 @@ def add_comment(request, product_id):
         form = ProductCommentForm()
 
     return render(request, 'add_comment.html', {'form': form})
+
+
+@login_required
+def update_quantity(request, product_id, new_quantity):
+    cart = Cart(request)
+    cart.update_quantity(product_id, int(new_quantity))
+
+    # Return a JSON response with the updated cart quantity
+    cart_items = cart.get_cart_items()
+    cart_quantity = cart_items.count()
+    return JsonResponse({'quantity': cart_quantity})
+
+@login_required
+def remove_item(request, product_id):
+    cart = Cart(request)
+    cart.remove(product_id)
+
+    # Return a JSON response with the updated cart quantity
+    cart_items = cart.get_cart_items()
+    cart_quantity = cart_items.count()
+    return JsonResponse({'quantity': cart_quantity})
