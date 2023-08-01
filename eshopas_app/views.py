@@ -52,10 +52,10 @@ def category_detail(request, pk):
     return render(request, 'category_detail.html', {'category': category, 'products': products})
 
 
-def category_products(request, category_slug):
-    category = Category.objects.get(slug=category_slug)
+def category_products(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
     products = Product.objects.filter(category=category)
-    return render(request, 'category_products.html', {'category': category, 'products': products})
+    return render(request, 'category_detail.html', {'category': category, 'products': products})
 
 
 def product_detail(request, product_id):
