@@ -42,7 +42,6 @@ def index(request):
 
     return render(request, 'index.html', context)
 
-
 def category(request):
     categories = Category.objects.all()
     return render(request, 'category.html', {'categories': categories})
@@ -51,6 +50,13 @@ def category_detail(request, pk):
     category = get_object_or_404(Category, pk=pk)
     products = Product.objects.filter(category=category)
     return render(request, 'category_detail.html', {'category': category, 'products': products})
+
+
+def category_products(request, category_slug):
+    category = Category.objects.get(slug=category_slug)
+    products = Product.objects.filter(category=category)
+    return render(request, 'category_products.html', {'category': category, 'products': products})
+
 
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)

@@ -6,15 +6,17 @@
 <body>
     <h1>Categories</h1>
     <ul>
-    {% for category in categories %}
-        <li>
-            <a href="{% url 'category_detail' category.id %}">
-                {{ category.name }}
-            </a>
-        </li>
-    {% empty %}
-        <li>No categories available.</li>
-    {% endfor %}
+        {% for category in categories %}
+            <li>
+                <a href="{% url 'category_detail' category.pk %}">{{ category.name }}</a>
+                <p>{{ category.description }}</p>
+            </li>
+        {% empty %}
+            <li>No categories available.</li>
+        {% endfor %}
     </ul>
+
+    <!-- Back to Main Page button -->
+    <a href="{% url 'index' %}" class="btn btn-primary">Back to Main Page</a>
 </body>
 </html>

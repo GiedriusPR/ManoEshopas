@@ -14,6 +14,7 @@
         <h2>{{ product.name }}</h2>
         <p>Price: ${{ product.price }}</p>
         <p>Category: {{ product.category.name }}</p>
+        <h2>Description:</h2>
         <div>{{ product.description|safe }}</div>
         <!-- Add image here -->
 
@@ -31,6 +32,8 @@
 
         <!-- Add product reviews and ratings here -->
 
+        <!-- Back to Main Page button -->
+        <a href="{% url 'index' %}" class="btn btn-primary">Back to Main Page</a>
     </div>
 
     <!-- Add footer here -->
