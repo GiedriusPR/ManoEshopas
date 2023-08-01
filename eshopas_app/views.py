@@ -28,7 +28,7 @@ def index(request):
     total_cart_value = sum([product.price for product in products_in_cart])
 
     # Pagination
-    paginator = Paginator(products, 20)
+    paginator = Paginator(products, 21)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 

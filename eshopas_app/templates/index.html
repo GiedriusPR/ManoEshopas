@@ -7,7 +7,7 @@
     <h2>Welcome to My E-Shop</h2>
 
     {% if user.is_authenticated %}
-        <p>Welcome, <a href="{% url 'profile' %}">{{ user.username }}</a>!</p>
+        <p>Welcome, {{ user.username }}!</p>
     {% else %}
         <p>Welcome, Guest!</p>
     {% endif %}
