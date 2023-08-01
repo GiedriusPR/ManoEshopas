@@ -1,7 +1,6 @@
 from django.db import models
 from PIL import Image
 import logging
-from tinymce import HTMLField
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 from django.db.models.signals import post_save
@@ -21,15 +20,16 @@ class Category(models.Model):
 class Product(models.Model):
     product_id = models.IntegerField(default=0)
     name = models.CharField(max_length=100)
-    price = models.DecimalField(max_digits=10, decimal_places=2)  # increased max_digits
+    price = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
     image = models.ImageField(upload_to='product_images/', blank=True, null=True)
-    description = HTMLField()
+    thumbnail = ImageSpecField(source='image', processors=[ResizeToFill(150, 200)], format='JPEG', options={'quality': 90})
+
     is_featured = models.BooleanField(default=True)
     stock = models.PositiveIntegerField(default=0)
     sales_discount = models.FloatField(default=0.0)
-    string = models.TextField(blank=True, null=True)
     discount = models.FloatField(default=0.0)
+    description = models.TextField(blank=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

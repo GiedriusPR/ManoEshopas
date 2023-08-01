@@ -40,7 +40,6 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'eshopas_app',
     'imagekit',
-    'tinymce',
     'crispy_forms',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -165,19 +164,5 @@ LOGGING = {
         },
     },
 }
-
-
-TINYMCE_DEFAULT_CONFIG = {
-    'height': 300,
-    'width': 600,
-    'cleanup_on_startup': True,
-    'custom_undo_redo_levels': 10,
-    'selector': 'textarea',
-    'plugins': 'paste',
-    'paste_as_text': True,
-    'menubar': False,
-    'toolbar': 'undo redo | styleselect | bold italic | link image',
-}
-
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

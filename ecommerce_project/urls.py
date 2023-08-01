@@ -6,7 +6,6 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('eshopas_app.urls')), # The change is here
-    path('tinymce/', include('tinymce.urls')),
     # Add other app URLs here if you have more apps in the project
 ] + (static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))

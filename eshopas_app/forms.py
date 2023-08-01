@@ -1,10 +1,8 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from tinymce import TinyMCE
 from .models import Product
 from django import forms
 from .models import Profile
-from tinymce import HTMLField
 
 
 class UserRegistrationForm(UserCreationForm):
@@ -18,8 +16,6 @@ class CartForm(forms.Form):
 
 
 class ProductForm(forms.ModelForm):
-    description = HTMLField()
-
     class Meta:
         model = Product
         fields = '__all__'

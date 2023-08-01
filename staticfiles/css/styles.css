@@ -187,3 +187,8 @@ tr:nth-child(even) {
   line-height: 20px;
   text-align: center;
 }
+
+img {
+  max-width: 150px;
+  max-height: 200px;
+}
