@@ -1,5 +1,5 @@
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Category, Product, Customer, ProductOrder, Review, Orders, User_login
+from .models import Category, Product, Customer, ProductOrder, Review, Orders, User_login, ProductComment
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -14,7 +14,7 @@ from .templatetags.myfilters import cart_total
 from .cart import Cart
 from django.http import HttpResponse
 from django.http import JsonResponse
-
+from .forms import ProductCommentForm
 
 logger = logging.getLogger(__name__)
 
@@ -59,8 +59,11 @@ def category_products(request, category_id):
 
 
 def product_detail(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    return render(request, 'product_detail.html', {'product': product})
+    product = get_object_or_404(Product, pk=product_id)
+    comments = ProductComment.objects.filter(product=product)
+    form = ProductCommentForm()
+
+    return render(request, 'product_detail.html', {'product': product, 'comments': comments, 'form': form})
 
 @login_required
 def cart(request):
@@ -210,3 +213,20 @@ def get_product_by_id(product_id):
     except Product.DoesNotExist:
         product = None
     return product
+
+
+@login_required
+def add_comment(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+
+    if request.method == 'POST':
+        form = ProductCommentForm(request.POST)
+        if form.is_valid():
+            comment = form.cleaned_data['comment']
+            user = request.user
+            ProductComment.objects.create(product=product, user=user, comment=comment)
+            return redirect('product_detail', product_id=product_id)
+    else:
+        form = ProductCommentForm()
+
+    return render(request, 'add_comment.html', {'form': form})

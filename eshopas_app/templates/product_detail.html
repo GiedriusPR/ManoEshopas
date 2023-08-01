@@ -1,42 +1,51 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ product.name }}</title>
-    <!-- Include CSS styles here -->
-</head>
-<body>
-    <header>
-        <!-- Header content -->
-    </header>
+{% extends 'base.html' %}
 
-    <div class="container">
-        <!-- Display product details -->
-        <h2>{{ product.name }}</h2>
-        <p>Price: ${{ product.price }}</p>
-        <p>Category: {{ product.category.name }}</p>
-        <h2>Description:</h2>
-        <div>{{ product.description|safe }}</div>
-        <!-- Add image here -->
+{% block content %}
+  <h1>{{ product.name }}</h1>
+  <p>Price: ${{ product.price }}</p>
+  <!-- Display other product details and image here -->
 
-        <!-- Display related products -->
-        <h3>Related Products</h3>
-        <div class="related-products">
-            {% for related_product in related_products %}
-                <div class="related-product">
-                    <h4>{{ related_product.name }}</h4>
-                    <p>Price: ${{ related_product.price }}</p>
-                    <a href="{% url 'product_detail' related_product.id %}">View Details</a>
-                </div>
-            {% endfor %}
-        </div>
+  <p>Category: {{ product.category.name }}</p>
+  <h2>Description:</h2>
+  <div>{{ product.description|safe }}</div>
+  <!-- Add image here -->
 
-        <!-- Add product reviews and ratings here -->
+  <!-- Display related products -->
+  <h3>Related Products</h3>
+  <div class="related-products">
+    {% for related_product in related_products %}
+      <div class="related-product">
+        <h4>{{ related_product.name }}</h4>
+        <p>Price: ${{ related_product.price }}</p>
+        <a href="{% url 'product_detail' related_product.id %}">View Details</a>
+      </div>
+    {% endfor %}
+  </div>
 
-        <!-- Back to Main Page button -->
-        <a href="{% url 'index' %}" class="btn btn-primary">Back to Main Page</a>
-    </div>
+  <!-- Display existing comments -->
+  {% if comments %}
+    <h2>Comments</h2>
+    <ul>
+      {% for comment in comments %}
+        <li>{{ comment.comment }} - by {{ comment.user.username }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No comments yet.</p>
+  {% endif %}
 
-    <!-- Add footer here -->
+  <!-- Add comment form -->
+  {% if user.is_authenticated %}
+    <h2>Add Comment</h2>
+    <form method="post" action="{% url 'add_comment' product.id %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Submit Comment</button>
+    </form>
+  {% else %}
+    <p>You must be logged in to leave a comment.</p>
+  {% endif %}
 
-</body>
-</html>
+  <!-- Back to Main Page button -->
+  <a href="{% url 'index' %}" class="btn btn-primary">Back to Main Page</a>
+{% endblock %}

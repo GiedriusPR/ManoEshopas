@@ -33,3 +33,7 @@ class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['img']
+
+
+class ProductCommentForm(forms.Form):
+    comment = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}))

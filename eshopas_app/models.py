@@ -53,6 +53,15 @@ class Product(models.Model):
         return self.name
 
 
+class ProductComment(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment = models.TextField(max_length=150)
+
+    def __str__(self):
+        return f"Comment by {self.user.username} on {self.product.name}"
+
+
 class Customer(models.Model):
     user = models.CharField(max_length=100)
     email = models.EmailField()
