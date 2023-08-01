@@ -189,13 +189,22 @@ class CategoryListView(View):
         context = {'categories': categories}
         return render(request, 'category_list.html', context)
 
+
 @login_required
-def add_to_cart(request, product_id):
-    product = get_product_by_id(product_id)
-    if product:
-        cart = Cart(request)
-        cart.add(product=product)
-    return redirect('cart_detail')
+def cart_detail(request):
+    cart = Cart(request)
+    cart_items = cart.get_cart_items()
+    cart_quantity = cart_items.count()
+    total_cart_value = cart.get_total_price()  # Calculate the total cart value
+
+    context = {
+        'cart_items': cart_items,
+        'cart_quantity': cart_quantity,
+        'total_cart_value': total_cart_value,  # Include the correct total cart value in the context
+    }
+
+    return render(request, 'cart_detail.html', context)
+
 
 @login_required
 def cart_detail(request):
