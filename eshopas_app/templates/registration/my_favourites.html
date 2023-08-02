@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load myfilters %}
+<link href="{% static 'css/styles.css' %}" rel="stylesheet">
+
+{% block content %}
+<h1>My Favourite Items</h1>
+{% if favourites %}
+    <ul>
+        {% for favourite in favourites %}
+            <li>{{ favourite.name }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>You haven't added any items to your favourites yet.</p>
+{% endif %}
+{% endblock %}
