@@ -169,3 +169,17 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 
 LOGIN_REDIRECT_URL = '/'
+
+# settings.py
+
+# Set the email backend to use SMTP for sending emails
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# SMTP server settings
+EMAIL_HOST = 'your-smtp-server.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# SMTP authentication settings (if required)
+EMAIL_HOST_USER = 'your-email@example.com'
+EMAIL_HOST_PASSWORD = 'your-email-password'

@@ -17,6 +17,8 @@ from .templatetags.myfilters import cart_total
 from .cart import Cart
 from django.views.decorators.http import require_POST
 from django.db.models import Q
+from django.contrib.auth.forms import UserCreationForm
+
 
 
 logger = logging.getLogger(__name__)
@@ -141,17 +143,35 @@ def logout_view(request):
     logout(request)
     return render(request, 'registration/logged_out.html')
 
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            messages.success(request, f'Account created for {username}. You can now log in.')
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+    return render(request, 'register.html', {'form': form})
+
+
 def register_view(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
+            print("Form is valid:", form.cleaned_data)
             form.save()
             messages.success(request, 'Account created successfully. You can now log in.')
-            return redirect('login')  # Redirect to the login page after successful registration
+            return redirect('login')
+        else:
+            print("Form errors:", form.errors)
     else:
         form = UserRegistrationForm()
 
     return render(request, 'register.html', {'form': form})
+
 
 def product_list(request):
     try:
