@@ -12,25 +12,30 @@
                 <th>Quantity</th>
                 <th>Price</th>
                 <th>Total</th>
-                <th>Actions</th>  <!-- Add a new column for actions -->
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-        {% for item in cart_items %}
-    <tr>
-        <td>{{ item.product.name }}</td>
-        <td>
-            <input type="number" value="{{ item.quantity }}" min="1" id="quantity_{{ item.product.id }}">
-            <button onclick="updateQuantity({{ item.product.id }})">Update</button>
-        </td>
-        <td>${{ item.product.price }}</td>
-        <td>${{ item.total_price }}</td>
-        <td>
-            <button onclick="removeItem({{ item.product.id }})">X</button>
-        </td>
-    </tr>
-{% endfor %}
-
+            {% for item in cart_items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>
+                        <form method="post" action="{% url 'update_quantity' item.product.id %}">
+                            {% csrf_token %}
+                            <input type="number" name="new_quantity" value="{{ item.quantity }}" min="1">
+                            <button type="submit">Update</button>
+                        </form>
+                    </td>
+                    <td>${{ item.product.price }}</td>
+                    <td>${{ item.total_price }}</td>
+                    <td>
+                        <form method="post" action="{% url 'remove_item' item.product.id %}">
+                            {% csrf_token %}
+                            <button type="submit">X</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
         </tbody>
         <tfoot>
             <tr>
@@ -39,29 +44,4 @@
             </tr>
         </tfoot>
     </table>
-<script>
-function updateQuantity(productId) {
-    const quantityInput = document.getElementById(`quantity_${productId}`);
-    const newQuantity = quantityInput.value;
-
-    fetch(`/update_quantity/${productId}/${newQuantity}/`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            // Reload the page to update the cart contents
-            location.reload();
-        })
-        .catch(error => console.error('Error:', error));
-}
-
-function removeItem(productId) {
-    fetch(`/remove_item/${productId}/`, { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            // Reload the page to update the cart contents
-            location.reload();
-        })
-        .catch(error => console.error('Error:', error));
-}
-</script>
-
 {% endblock %}

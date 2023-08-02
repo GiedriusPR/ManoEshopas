@@ -15,6 +15,8 @@ from .forms import (
 )
 from .templatetags.myfilters import cart_total
 from .cart import Cart
+from django.views.decorators.http import require_POST
+
 
 logger = logging.getLogger(__name__)
 
@@ -195,7 +197,25 @@ def cart_detail(request):
     cart_items = cart.get_cart_items()
     total_cart_value = cart.get_total_price()
 
-    return render(request, 'cart_detail.html', {'cart_items': cart_items, 'total_cart_value': total_cart_value})
+    if request.method == 'POST':
+        # Check if the form is for updating quantity
+        if 'new_quantity' in request.POST:
+            product_id = int(request.POST['product_id'])
+            new_quantity = int(request.POST['new_quantity'])
+            cart.update_quantity(product_id, new_quantity)
+
+        # Check if the form is for removing an item from the cart
+        elif 'remove_item' in request.POST:
+            product_id = int(request.POST['product_id'])
+            cart.remove(product_id)
+
+        # Redirect back to the cart page after processing the form
+        return redirect('cart_detail')
+
+    return render(request, 'cart_detail.html', {
+        'cart_items': cart_items,
+        'total_cart_value': total_cart_value,
+    })
 
 
 @login_required
@@ -223,23 +243,24 @@ def add_comment(request, product_id):
 
     return render(request, 'add_comment.html', {'form': form})
 
-
+@require_POST
 @login_required
-def update_quantity(request, product_id, new_quantity):
+def update_quantity(request, product_id):
     cart = Cart(request)
-    cart.update_quantity(product_id, int(new_quantity))
+    new_quantity = request.POST.get('new_quantity')
 
-    # Return a JSON response with the updated cart quantity
+    if new_quantity is not None:
+        cart.update_quantity(product_id, int(new_quantity))
+
+    # Return a JSON response with the updated cart details
     cart_items = cart.get_cart_items()
-    cart_quantity = cart_items.count()
-    return JsonResponse({'quantity': cart_quantity})
+    total_cart_value = cart.get_total_price()
+    return JsonResponse({'cart_items': cart_items, 'total_cart_value': total_cart_value})
 
+@require_POST
 @login_required
 def remove_item(request, product_id):
     cart = Cart(request)
     cart.remove(product_id)
+    return redirect('cart_detail')
 
-    # Return a JSON response with the updated cart quantity
-    cart_items = cart.get_cart_items()
-    cart_quantity = cart_items.count()
-    return JsonResponse({'quantity': cart_quantity})

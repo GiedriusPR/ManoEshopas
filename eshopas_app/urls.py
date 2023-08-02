@@ -20,6 +20,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('register/', views.register_view, name='register'),
     path('profile/', views.profile_view, name='profile'),
-    path('update_quantity/<int:product_id>/<int:new_quantity>/', views.update_quantity, name='update_quantity'),
+    path('update_quantity/<int:product_id>/', views.update_quantity, name='update_quantity'),
     path('remove_item/<int:product_id>/', views.remove_item, name='remove_item'),
 ]
