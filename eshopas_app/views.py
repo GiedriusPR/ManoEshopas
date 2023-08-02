@@ -140,7 +140,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('index')
+    return render(request, 'registration/logged_out.html')
 
 def register_view(request):
     if request.method == 'POST':
@@ -281,3 +281,25 @@ def search(request):
     }
 
     return render(request, 'search.html', context)
+
+
+@login_required
+def toggle_favourite(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    # Check if the product is already in the user's favourites
+    if request.user in product.favourites.all():
+        # If yes, remove it
+        product.favourites.remove(request.user)
+    else:
+        # If not, add it
+        product.favourites.add(request.user)
+
+    return redirect('product_detail', product_id=product_id)
+
+
+@login_required
+def my_favourites_view(request):
+    favourites = request.user.favourites.all()
+    context = {'favourites': favourites}
+    return render(request, 'registration/my_favourites.html', context)

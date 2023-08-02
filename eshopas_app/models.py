@@ -24,12 +24,12 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
     image = models.ImageField(upload_to='product_images/', blank=True, null=True)
     thumbnail = ImageSpecField(source='image', processors=[ResizeToFill(150, 200)], format='JPEG', options={'quality': 90})
-
     is_featured = models.BooleanField(default=True)
     stock = models.PositiveIntegerField(default=0)
     sales_discount = models.FloatField(default=0.0)
     discount = models.FloatField(default=0.0)
     description = models.TextField(blank=True)
+    favourites = models.ManyToManyField(User, related_name='favourites', blank=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

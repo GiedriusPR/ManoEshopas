@@ -16,15 +16,16 @@
     <div class="container">
         <a class="navbar-brand btn btn-primary" href="/">Eshop</a>
         <li>
-    <form action="{% url 'search' %}" method="get" class="form-inline my-2 my-md-0">
-    <input name="query" class="form-control" type="text" placeholder="Paieška">
-    </form>
+            <form action="{% url 'search' %}" method="get" class="form-inline my-2 my-md-0">
+                <input name="query" class="form-control" type="text" placeholder="Paieška">
+            </form>
         </li>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav ml-auto">
                 <a class="nav-item nav-link btn btn-primary" href="/category/">Categories</a>
                 {% if user.is_authenticated %}
                     <a class="nav-item nav-link btn btn-primary" href="/profile/">Profile</a>
+                    <a class="nav-item nav-link btn btn-primary" href="/my-favourites/">My Favourites</a> <!-- New link for My Favourites -->
                     <a class="nav-item nav-link btn btn-primary" href="/logout/">Logout</a>
                 {% else %}
                     <a class="nav-item nav-link btn btn-primary" href="/login/">Login</a>

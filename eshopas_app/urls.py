@@ -18,9 +18,12 @@ urlpatterns = [
     path('order_success/<int:order_id>/', views.order_success, name='order_success'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('my-favourites/', views.my_favourites_view, name='my_favourites'),
+    path('toggle-favourite/<int:product_id>/', views.toggle_favourite, name='toggle_favourite'),
     path('register/', views.register_view, name='register'),
     path('profile/', views.profile_view, name='profile'),
     path('update_quantity/<int:product_id>/', views.update_quantity, name='update_quantity'),
     path('remove_item/<int:product_id>/', views.remove_item, name='remove_item'),
     path('search/', views.search, name='search'),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
