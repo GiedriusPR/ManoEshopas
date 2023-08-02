@@ -1,7 +1,5 @@
 from django.urls import path, include
 from . import views
-from .views import cart_detail
-
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -25,5 +23,6 @@ urlpatterns = [
     path('update_quantity/<int:product_id>/', views.update_quantity, name='update_quantity'),
     path('remove_item/<int:product_id>/', views.remove_item, name='remove_item'),
     path('search/', views.search, name='search'),
+    # Include the authentication URLs once
     path('accounts/', include('django.contrib.auth.urls')),
 ]

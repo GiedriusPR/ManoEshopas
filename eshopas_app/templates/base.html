@@ -28,7 +28,7 @@
                     <a class="nav-item nav-link btn btn-primary" href="/my-favourites/">My Favourites</a> <!-- New link for My Favourites -->
                     <a class="nav-item nav-link btn btn-primary" href="/logout/">Logout</a>
                 {% else %}
-                    <a class="nav-item nav-link btn btn-primary" href="/login/">Login</a>
+                    <a class="nav-item nav-link btn btn-primary" href="{% url 'login' %}">Login</a>
                     <a class="nav-item nav-link btn btn-primary" href="/register/">Register</a>
                 {% endif %}
                 <a class="nav-item nav-link btn btn-primary" href="/cart-detail/">Cart ({{ request.session.cart|cart_total }})</a>

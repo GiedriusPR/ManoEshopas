@@ -19,7 +19,6 @@ from django.views.decorators.http import require_POST
 from django.db.models import Q
 
 
-
 logger = logging.getLogger(__name__)
 
 def index(request):
@@ -119,6 +118,7 @@ def order_success(request, order_id):
 
     return render(request, 'order_success.html', {'order': order})
 
+
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -129,13 +129,12 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.info(request, f"You are now logged in as {username}.")
-                return redirect('index')  # Replace 'index' with the name of your homepage URL pattern
+                return redirect('login')  # Replace 'index' with the name of your homepage URL pattern
             else:
                 messages.error(request, "Invalid username or password.")
-        else:
-            messages.error(request, "Invalid username or password.")
-    form = AuthenticationForm()
-    return render(request=request, template_name="eshopas_app/login.html", context={"login_form": form})
+    else:
+        form = AuthenticationForm()
+    return render(request, template_name="registration/login.html", context={"login_form": form})
 
 
 def logout_view(request):
