@@ -15,6 +15,11 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
         <a class="navbar-brand btn btn-primary" href="/">Eshop</a>
+        <li>
+    <form action="{% url 'search' %}" method="get" class="form-inline my-2 my-md-0">
+    <input name="query" class="form-control" type="text" placeholder="Paieška">
+    </form>
+        </li>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav ml-auto">
                 <a class="nav-item nav-link btn btn-primary" href="/category/">Categories</a>

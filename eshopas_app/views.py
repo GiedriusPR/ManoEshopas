@@ -16,6 +16,8 @@ from .forms import (
 from .templatetags.myfilters import cart_total
 from .cart import Cart
 from django.views.decorators.http import require_POST
+from django.db.models import Q
+
 
 
 logger = logging.getLogger(__name__)
@@ -264,3 +266,18 @@ def remove_item(request, product_id):
     cart.remove(product_id)
     return redirect('cart_detail')
 
+
+def search(request):
+    query = request.GET.get('query')
+
+    if query:
+        search_results = Product.objects.filter(Q(name__icontains=query) | Q(description__icontains=query))
+    else:
+        search_results = []
+
+    context = {
+        'query': query,
+        'products': search_results,
+    }
+
+    return render(request, 'search.html', context)
