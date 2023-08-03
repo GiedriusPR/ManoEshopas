@@ -4,22 +4,21 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.views import View
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 import logging
 from .models import (
-    Category, Product, Customer, ProductOrder, Review, Orders, User_login, ProductComment
+    Category, Product, Cart, Customer, ProductOrder, Review, Orders, User_login, ProductComment, CartItem
 )
 from .forms import (
     UserRegistrationForm, CartForm, UserUpdateForm, ProfileUpdateForm, ProductCommentForm
 )
 from .templatetags.myfilters import cart_total
-from .cart import Cart
 from django.views.decorators.http import require_POST
 from django.db.models import Q
 from django.contrib.auth.forms import UserCreationForm
-
-
+from django.forms.models import model_to_dict
+from _decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
@@ -214,29 +213,33 @@ class CategoryListView(View):
 
 @login_required
 def cart_detail(request):
-    cart = Cart(request)
-    cart_items = cart.get_cart_items()
-    total_cart_value = cart.get_total_price()
+    user = request.user
+    cart, created = Cart.objects.get_or_create(user=user)
+    cart_items = CartItem.objects.filter(cart=cart)
 
-    if request.method == 'POST':
-        # Check if the form is for updating quantity
-        if 'new_quantity' in request.POST:
-            product_id = int(request.POST['product_id'])
-            new_quantity = int(request.POST['new_quantity'])
-            cart.update_quantity(product_id, new_quantity)
+    total_cart_value = sum(item.total_price() for item in cart_items)
 
-        # Check if the form is for removing an item from the cart
-        elif 'remove_item' in request.POST:
-            product_id = int(request.POST['product_id'])
-            cart.remove(product_id)
-
-        # Redirect back to the cart page after processing the form
-        return redirect('cart_detail')
-
-    return render(request, 'cart_detail.html', {
+    context = {
         'cart_items': cart_items,
         'total_cart_value': total_cart_value,
-    })
+    }
+
+    return render(request, 'cart_detail.html', context)
+
+
+@login_required
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+
+    cart, _ = Cart.objects.get_or_create(user=request.user)
+
+    cart_item, item_created = CartItem.objects.get_or_create(cart=cart, product=product)
+    if not item_created:
+        cart_item.quantity += 1
+        cart_item.save()
+
+    messages.success(request, "Item added to your cart!")
+    return redirect('cart_detail')
 
 
 @login_required
@@ -264,19 +267,35 @@ def add_comment(request, product_id):
 
     return render(request, 'add_comment.html', {'form': form})
 
+
 @require_POST
 @login_required
 def update_quantity(request, product_id):
-    cart = Cart(request)
-    new_quantity = request.POST.get('new_quantity')
+    if request.method == 'POST':
+        new_quantity = int(request.POST.get('new_quantity', 0))
 
-    if new_quantity is not None:
-        cart.update_quantity(product_id, int(new_quantity))
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            # Handle the case if the product with the given ID does not exist
+            # For example, redirect to the cart detail page with an error message
+            return redirect('cart_detail')
 
-    # Return a JSON response with the updated cart details
-    cart_items = cart.get_cart_items()
-    total_cart_value = cart.get_total_price()
-    return JsonResponse({'cart_items': cart_items, 'total_cart_value': total_cart_value})
+        cart = Cart(request)
+        cart.update_quantity(product, new_quantity)
+
+        # Calculate the new total cart value
+        total_cart_value = cart.get_total_price()
+
+        # Return the updated cart items and total cart value in JSON response
+        cart_items = [{'product': item.product.name, 'quantity': item.quantity, 'total_price': item.total_price}
+                      for item in cart.get_cart_items()]
+
+        return JsonResponse({'cart_items': cart_items, 'total_cart_value': total_cart_value})
+
+    # If the request is not a POST request, redirect to the cart detail page
+    return redirect('cart_detail')
+
 
 @require_POST
 @login_required

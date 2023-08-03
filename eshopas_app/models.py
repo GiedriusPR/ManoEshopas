@@ -6,6 +6,7 @@ from imagekit.processors import ResizeToFill
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
+from decimal import Decimal
 
 
 class Category(models.Model):
@@ -51,6 +52,23 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Cart(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Cart for {self.user.username}"
+
+
+class CartItem(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, default=None)
+
+    def total_price(self):
+        return self.product.price * self.quantity
 
 
 class ProductComment(models.Model):

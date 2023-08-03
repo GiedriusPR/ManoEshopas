@@ -8,6 +8,10 @@
   <p>Category: {{ product.category.name }}</p>
   <h2>Description:</h2>
   <div>{{ product.description|safe }}</div>
+    <form method="post" action="{% url 'add_to_cart' product.id %}">
+        {% csrf_token %}
+        <button type="submit">Add to Cart</button>
+    </form>
   <!-- Add image here -->
   {% if user.is_authenticated %}
       {% if user in product.favourites.all %}
