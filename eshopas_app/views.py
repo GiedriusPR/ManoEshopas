@@ -325,6 +325,13 @@ def toggle_favourite(request, product_id):
 
 @login_required
 def my_favourites_view(request):
-    favourites = request.user.favourites.all()
-    context = {'favourites': favourites}
-    return render(request, 'registration/my_favourites.html', context)
+    user = request.user
+    if user.is_authenticated:
+        favourite_products = user.favourites.all()
+    else:
+        favourite_products = []
+
+    context = {
+        'favourite_products': favourite_products
+    }
+    return render(request, 'my_favourites.html', context)
