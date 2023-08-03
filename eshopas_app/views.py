@@ -272,36 +272,23 @@ def add_comment(request, product_id):
 @login_required
 def update_quantity(request, product_id):
     if request.method == 'POST':
-        new_quantity = int(request.POST.get('new_quantity', 0))
-
-        try:
-            product = Product.objects.get(id=product_id)
-        except Product.DoesNotExist:
-            # Handle the case if the product with the given ID does not exist
-            # For example, redirect to the cart detail page with an error message
-            return redirect('cart_detail')
-
-        cart = Cart(request)
-        cart.update_quantity(product, new_quantity)
-
-        # Calculate the new total cart value
-        total_cart_value = cart.get_total_price()
-
-        # Return the updated cart items and total cart value in JSON response
-        cart_items = [{'product': item.product.name, 'quantity': item.quantity, 'total_price': item.total_price}
-                      for item in cart.get_cart_items()]
-
-        return JsonResponse({'cart_items': cart_items, 'total_cart_value': total_cart_value})
-
-    # If the request is not a POST request, redirect to the cart detail page
+        new_quantity = int(request.POST['quantity'])
+        if new_quantity <= 0:
+            messages.warning(request, "Quantity must be a positive number.")
+        else:
+            cart = get_object_or_404(Cart, user=request.user)
+            cart.update_quantity(product_id, new_quantity)
+            messages.success(request, "Quantity updated successfully.")
     return redirect('cart_detail')
 
 
 @require_POST
 @login_required
 def remove_item(request, product_id):
-    cart = Cart(request)
-    cart.remove(product_id)
+    cart = get_object_or_404(Cart, user=request.user)
+    cart_item = get_object_or_404(CartItem, cart=cart, product_id=product_id)
+    cart_item.delete()
+    messages.success(request, "Item removed from your cart.")
     return redirect('cart_detail')
 
 

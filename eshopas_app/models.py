@@ -1,6 +1,8 @@
 from django.db import models
 from PIL import Image
 import logging
+
+from django.shortcuts import get_object_or_404
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 from django.db.models.signals import post_save
@@ -59,6 +61,11 @@ class Cart(models.Model):
 
     def __str__(self):
         return f"Cart for {self.user.username}"
+
+    def update_quantity(self, product_id, new_quantity):
+        cart_item = get_object_or_404(CartItem, cart=self, product_id=product_id)
+        cart_item.quantity = new_quantity
+        cart_item.save()
 
 
 class CartItem(models.Model):
