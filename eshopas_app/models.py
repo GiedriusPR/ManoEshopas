@@ -136,7 +136,8 @@ class User_login(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    address = models.TextField(blank=True)
+    home_address = models.TextField(blank=True)
+    city_town = models.CharField(max_length=100, blank=True)
     img = models.ImageField(upload_to='profile_pics', default='default.jpg')
     thumbnail = ImageSpecField(source='img',
                                processors=[ResizeToFill(100, 50)],
@@ -145,6 +146,7 @@ class Profile(models.Model):
 
     def __str__(self):
         return f'{self.user.username} Profile'
+
 
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
