@@ -1,23 +1,26 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load myfilters %}
+<link href="{% static 'css/styles.css' %}" rel="stylesheet">
 
 {% block content %}
   <h1>{{ product.name }}</h1>
-  <p>Price: ${{ product.price }}</p>
+  <p><strong>Price:</strong> ${{ product.price }}</p>
   <!-- Display other product details and image here -->
 
-  <p>Category: {{ product.category.name }}</p>
+  <p><strong>Category:</strong> {{ product.category.name }}</p>
   <h2>Description:</h2>
   <div>{{ product.description|safe }}</div>
     <form method="post" action="{% url 'add_to_cart' product.id %}">
         {% csrf_token %}
         <button type="submit">Add to Cart</button>
     </form>
-  <!-- Add image here -->
+  <!-- Favorite item -->
   {% if user.is_authenticated %}
       {% if user in product.favourites.all %}
-          <a href="{% url 'toggle_favourite' product_id=product.id %}">❤️</a> <!-- Already in favourites -->
+          <h2><strong>Favorite item:</strong> ❤️</h2> <!-- Already in favourites -->
       {% else %}
-          <a href="{% url 'toggle_favourite' product_id=product.id %}">♡</a> <!-- Not in favourites -->
+          <h2><strong>Favorite item:</strong> <a href="{% url 'toggle_favourite' product_id=product.id %}">♡</a></h2> <!-- Not in favourites -->
       {% endif %}
   {% endif %}
   <!-- Display related products -->

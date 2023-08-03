@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Categories</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block content %}
     <h1>Categories</h1>
     <ul>
         {% for category in categories %}
@@ -18,5 +15,4 @@
 
     <!-- Back to Main Page button -->
     <a href="{% url 'index' %}" class="btn btn-primary">Back to Main Page</a>
-</body>
-</html>
+{% endblock %}
