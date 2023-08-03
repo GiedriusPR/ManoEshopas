@@ -25,7 +25,7 @@
                 <a class="nav-item nav-link btn btn-primary" href="/category/">Categories</a>
                 {% if user.is_authenticated %}
                     <a class="nav-item nav-link btn btn-primary" href="/profile/">Profile</a>
-                    <a class="nav-item nav-link btn btn-primary" href="/my-favourites/">My Favourites</a> <!-- New link for My Favourites -->
+                    <a class="nav-item nav-link btn btn-primary" href="/my-favorites/">My Favorites</a> <!-- New link for My Favorites -->
                     <a class="nav-item nav-link btn btn-primary" href="/logout/">Logout</a>
                 {% else %}
                     <a class="nav-item nav-link btn btn-primary" href="{% url 'login' %}">Login</a>

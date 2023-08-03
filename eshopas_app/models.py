@@ -1,7 +1,6 @@
 from django.db import models
 from PIL import Image
 import logging
-
 from django.shortcuts import get_object_or_404
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
@@ -32,7 +31,7 @@ class Product(models.Model):
     sales_discount = models.FloatField(default=0.0)
     discount = models.FloatField(default=0.0)
     description = models.TextField(blank=True)
-    favourites = models.ManyToManyField(User, related_name='favourites', blank=True)
+    favorites = models.ManyToManyField(User, related_name='favorites', blank=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

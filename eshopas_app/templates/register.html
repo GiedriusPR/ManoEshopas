@@ -5,12 +5,12 @@
 
 {% block content %}
     <div class="container register">
-        <h3>Registracija</h3><br/>
+        <h3>Registration</h3><br/>
         <form method="post" action="{% url 'register' %}">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Registruotis</button>
+            <button type="submit" class="btn btn-primary">Register</button>
         </form>
-        <p>Jeigu užsiregistravote anksčiau, <a href="/login"><strong>prisijunkite.</strong></a></p>
+        <p>If you registered earlier, <a href="/login"><strong>login.</strong></a></p>
     </div>
 {% endblock %}

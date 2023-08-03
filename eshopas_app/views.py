@@ -309,29 +309,29 @@ def search(request):
 
 
 @login_required
-def toggle_favourite(request, product_id):
+def toggle_favorite(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
-    # Check if the product is already in the user's favourites
-    if request.user in product.favourites.all():
+    # Check if the product is already in the user's favorites
+    if request.user in product.favorites.all():
         # If yes, remove it
-        product.favourites.remove(request.user)
+        product.favorites.remove(request.user)
     else:
         # If not, add it
-        product.favourites.add(request.user)
+        product.favorites.add(request.user)
 
     return redirect('product_detail', product_id=product_id)
 
 
 @login_required
-def my_favourites_view(request):
+def my_favorites_view(request):
     user = request.user
     if user.is_authenticated:
-        favourite_products = user.favourites.all()
+        favorite_products = user.favorites.all()
     else:
-        favourite_products = []
+        favorite_products = []
 
     context = {
-        'favourite_products': favourite_products
+        'favorite_products': favorite_products
     }
-    return render(request, 'my_favourites.html', context)
+    return render(request, 'my_favorites.html', context)

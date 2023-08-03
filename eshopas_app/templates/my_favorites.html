@@ -4,12 +4,12 @@
 <link href="{% static 'css/styles.css' %}" rel="stylesheet">
 
 {% block content %}
-  <h1>My Favourite Items</h1>
+  <h1>My Favorite Items</h1>
   <ul>
-    {% for product in favourite_products %}
+    {% for product in favorite_products %}
       <li><a href="{% url 'product_detail' product.id %}">{{ product.name }}</a></li>
     {% empty %}
-      <li>No favourite items added.</li>
+      <li>No favorite items added.</li>
     {% endfor %}
   </ul>
 {% endblock %}

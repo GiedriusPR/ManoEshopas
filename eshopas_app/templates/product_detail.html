@@ -17,10 +17,10 @@
     </form>
   <!-- Favorite item -->
   {% if user.is_authenticated %}
-      {% if user in product.favourites.all %}
-          <h2><strong>Favorite item:</strong> ❤️</h2> <!-- Already in favourites -->
+      {% if user in product.favorites.all %}
+          <h2><strong>Favorite item:</strong> ❤️</h2> <!-- Already in favorites -->
       {% else %}
-          <h2><strong>Favorite item:</strong> <a href="{% url 'toggle_favourite' product_id=product.id %}">♡</a></h2> <!-- Not in favourites -->
+          <h2><strong>Favorite item:</strong> <a href="{% url 'toggle_favorite' product_id=product.id %}">♡</a></h2> <!-- Not in favorites -->
       {% endif %}
   {% endif %}
   <!-- Display related products -->
