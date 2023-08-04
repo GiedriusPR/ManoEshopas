@@ -1,25 +1,21 @@
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.core.paginator import Paginator
-from django.views import View
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from django.contrib.auth import authenticate, login, logout
 import logging
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth import authenticate, login, logout
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views import View
+from django.views.decorators.http import require_POST
 from .models import (
     Category, Product, Cart, Customer, ProductOrder, Review, Orders, User_login, ProductComment, CartItem, Comment
 )
 from .forms import (
-    UserRegistrationForm, CartForm, UserUpdateForm, ProfileUpdateForm, ProductCommentForm
+    UserRegistrationForm, CartForm, UserUpdateForm, ProfileUpdateForm, ProductCommentForm,
 )
 from .templatetags.myfilters import cart_total
-from django.views.decorators.http import require_POST
-from django.db.models import Q
-from django.contrib.auth.forms import UserCreationForm
-from django.forms.models import model_to_dict
-from _decimal import Decimal
-from django.shortcuts import render, get_object_or_404
+from django.contrib import messages
 
 
 logger = logging.getLogger(__name__)
@@ -74,18 +70,23 @@ def product_detail(request, product_id):
             comment_text = form.cleaned_data['comment']
             comment = Comment.objects.create(user=request.user, product=product, comment=comment_text)
             comment.save()
-            # You may want to redirect or refresh the page after saving the comment
+            # Redirect back to the product detail page after submitting a comment
+            return redirect('product_detail', product_id=product_id)
 
     else:
         form = ProductCommentForm()
 
+    related_products = Product.objects.filter(category=product.category).exclude(id=product_id)[:3]
+
     context = {
         'product': product,
+        'related_products': related_products,
         'comments': comments,
         'form': form,
     }
 
     return render(request, 'product_detail.html', context)
+
 
 @login_required
 def cart(request):
@@ -272,17 +273,16 @@ def get_product_by_id(product_id):
 @login_required
 def add_comment(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
-
     if request.method == 'POST':
-        form = ProductCommentForm(request.POST)
+        form = ProductCommentForm(request.POST, request.FILES)
         if form.is_valid():
-            comment = form.cleaned_data['comment']
-            user = request.user
-            ProductComment.objects.create(product=product, user=user, comment=comment)
+            comment = form.save(commit=False)
+            comment.product = product
+            comment.user = request.user
+            comment.save()
             return redirect('product_detail', product_id=product_id)
     else:
         form = ProductCommentForm()
-
     return render(request, 'add_comment.html', {'form': form})
 
 

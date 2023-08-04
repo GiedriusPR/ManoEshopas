@@ -1,13 +1,15 @@
 from django.db import models
+from django.utils import timezone
 from PIL import Image
 import logging
 from django.shortcuts import get_object_or_404
 from imagekit.models import ImageSpecField
-from imagekit.processors import ResizeToFill
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
-from decimal import Decimal
+from .image_processors import ResizeImageProcessor, ResizeProfilePictureinCommentProcessor, ResizeToFill
+
+
 
 
 class Category(models.Model):
@@ -78,12 +80,19 @@ class CartItem(models.Model):
 
 
 class ProductComment(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    comment = models.TextField(max_length=150)
+    comment = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now)
+    # Add an ImageField for the user's profile picture
+    profile_picture = models.ImageField(upload_to='comment_profile_pics', blank=True, null=True)
 
-    def __str__(self):
-        return f"Comment by {self.user.username} on {self.product.name}"
+    # Create a thumbnail of the user's profile picture with the ResizeProfilePictureinCommentProcessor
+    profile_thumbnail = ImageSpecField(
+        source='profile_picture',
+        processors=[ResizeProfilePictureinCommentProcessor],
+        format='JPEG',
+        options={'quality': 90}
+    )
 
 
 class Customer(models.Model):

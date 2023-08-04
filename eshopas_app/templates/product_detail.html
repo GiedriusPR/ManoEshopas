@@ -23,25 +23,12 @@
           <h2><strong>Favorite item:</strong> <a href="{% url 'toggle_favorite' product_id=product.id %}">♡</a></h2> <!-- Not in favorites -->
       {% endif %}
   {% endif %}
-  <!-- Display related products -->
-  <h3>Related Products</h3>
-  <div class="related-products">
-    {% for related_product in related_products %}
-      <div class="related-product">
-        <h4>{{ related_product.name }}</h4>
-        <p>Price: ${{ related_product.price }}</p>
-        <a href="{% url 'product_detail' related_product.id %}">View Details</a>
-      </div>
-    {% endfor %}
-  </div>
-
-  <!-- Display existing comments -->
   {% if comments %}
     <h2>Comments</h2>
     <ul>
       {% for comment in comments %}
         <li>
-          Comment.by{{ comment.user.username }}
+          Comment.by {{ comment.user.username }}
           <img src="{{ comment.user.profile.thumbnail.url }}" width="40" height="40">
           - {{ comment.comment }}
         </li>
@@ -62,6 +49,17 @@
   {% else %}
     <p>You must be logged in to leave a comment.</p>
   {% endif %}
+
+  <h3>Related Products</h3>
+  <div class="related-products">
+    {% for related_product in related_products %}
+      <div class="related-product">
+        <h4>{{ related_product.name }}</h4>
+        <p>Price: ${{ related_product.price }}</p>
+        <a href="{% url 'product_detail' related_product.id %}">View Details</a>
+      </div>
+    {% endfor %}
+  </div>
 
   <!-- Back to Main Page button -->
   <a href="{% url 'index' %}" class="btn btn-primary">Back to Main Page</a>
