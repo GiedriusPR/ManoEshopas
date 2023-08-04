@@ -40,7 +40,11 @@
     <h2>Comments</h2>
     <ul>
       {% for comment in comments %}
-        <li>{{ comment.comment }} - by {{ comment.user.username }}</li>
+        <li>
+          Comment.by{{ comment.user.username }}
+          <img src="{{ comment.user.profile.thumbnail.url }}" width="40" height="40">
+          - {{ comment.comment }}
+        </li>
       {% endfor %}
     </ul>
   {% else %}

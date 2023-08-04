@@ -136,11 +136,11 @@ class User_login(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    home_address = models.TextField(blank=True)
     city_town = models.CharField(max_length=100, blank=True)
+    home_address = models.CharField(max_length=255, blank=True)  # Add this line
     img = models.ImageField(upload_to='profile_pics', default='default.jpg')
     thumbnail = ImageSpecField(source='img',
-                               processors=[ResizeToFill(100, 50)],
+                               processors=[ResizeToFill(40, 40)],
                                format='JPEG',
                                options={'quality': 60})
 
@@ -154,3 +154,13 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
         Profile.objects.create(user=instance)
     else:
         instance.profile.save()
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Comment by {self.user.username} on {self.product.name}"

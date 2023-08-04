@@ -8,7 +8,7 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 import logging
 from .models import (
-    Category, Product, Cart, Customer, ProductOrder, Review, Orders, User_login, ProductComment, CartItem
+    Category, Product, Cart, Customer, ProductOrder, Review, Orders, User_login, ProductComment, CartItem, Comment
 )
 from .forms import (
     UserRegistrationForm, CartForm, UserUpdateForm, ProfileUpdateForm, ProductCommentForm
@@ -19,6 +19,8 @@ from django.db.models import Q
 from django.contrib.auth.forms import UserCreationForm
 from django.forms.models import model_to_dict
 from _decimal import Decimal
+from django.shortcuts import render, get_object_or_404
+
 
 logger = logging.getLogger(__name__)
 
@@ -63,11 +65,27 @@ def category_products(request, category_id):
 
 
 def product_detail(request, product_id):
-    product = get_object_or_404(Product, pk=product_id)
-    comments = ProductComment.objects.filter(product=product)
-    form = ProductCommentForm()
+    product = get_object_or_404(Product, id=product_id)
+    comments = Comment.objects.filter(product=product)
 
-    return render(request, 'product_detail.html', {'product': product, 'comments': comments, 'form': form})
+    if request.method == 'POST':
+        form = ProductCommentForm(request.POST)
+        if form.is_valid():
+            comment_text = form.cleaned_data['comment']
+            comment = Comment.objects.create(user=request.user, product=product, comment=comment_text)
+            comment.save()
+            # You may want to redirect or refresh the page after saving the comment
+
+    else:
+        form = ProductCommentForm()
+
+    context = {
+        'product': product,
+        'comments': comments,
+        'form': form,
+    }
+
+    return render(request, 'product_detail.html', context)
 
 @login_required
 def cart(request):
@@ -187,18 +205,22 @@ def profile_view(request):
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=request.user)
         profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return redirect('profile')
+            return redirect('profile')  # Redirect to the profile page after successful update
     else:
         user_form = UserUpdateForm(instance=request.user)
         profile_form = ProfileUpdateForm(instance=request.user.profile)
+
     context = {
         'user_form': user_form,
         'profile_form': profile_form,
     }
+
     return render(request, 'profile.html', context)
+
 
 class CategoryListView(View):
     def get(self, request):
