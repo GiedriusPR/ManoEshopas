@@ -2,6 +2,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Product, Profile, Comment
 from django import forms
+from PIL import Image
 
 class UserRegistrationForm(UserCreationForm):
     class Meta:

@@ -16,7 +16,7 @@ from .forms import (
 )
 from .templatetags.myfilters import cart_total
 from django.contrib import messages
-
+from PIL import Image
 
 logger = logging.getLogger(__name__)
 

@@ -183,3 +183,11 @@ EMAIL_USE_TLS = True
 # SMTP authentication settings (if required)
 EMAIL_HOST_USER = 'your-email@example.com'
 EMAIL_HOST_PASSWORD = 'your-email-password'
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
