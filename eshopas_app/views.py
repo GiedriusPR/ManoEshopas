@@ -61,26 +61,22 @@ def category_products(request, category_id):
 
 
 def product_detail(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    comments = Comment.objects.filter(product=product)
+    product = get_object_or_404(Product, pk=product_id)
+    comments = Comment.objects.filter(product=product).order_by('-created_at')
 
-    if request.method == 'POST':
+    if request.method == 'POST' and request.user.is_authenticated:
         form = ProductCommentForm(request.POST)
         if form.is_valid():
-            comment_text = form.cleaned_data['comment']
-            comment = Comment.objects.create(user=request.user, product=product, comment=comment_text)
+            comment = form.save(commit=False)
+            comment.user = request.user
+            comment.product = product  # Set the product field
             comment.save()
-            # Redirect back to the product detail page after submitting a comment
-            return redirect('product_detail', product_id=product_id)
-
+            return redirect('product_detail', product_id=product.id)
     else:
         form = ProductCommentForm()
 
-    related_products = Product.objects.filter(category=product.category).exclude(id=product_id)[:3]
-
     context = {
         'product': product,
-        'related_products': related_products,
         'comments': comments,
         'form': form,
     }

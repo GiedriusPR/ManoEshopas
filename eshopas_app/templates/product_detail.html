@@ -28,9 +28,7 @@
     <ul>
       {% for comment in comments %}
         <li>
-          Comment.by {{ comment.user.username }}
-          <img src="{{ comment.user.profile.thumbnail.url }}" width="40" height="40">
-          - {{ comment.comment }}
+          Comment by {{ comment.user.username }} - {{ comment.comment }}
         </li>
       {% endfor %}
     </ul>
@@ -40,14 +38,14 @@
 
   <!-- Add comment form -->
   {% if user.is_authenticated %}
-    <h2>Add Comment</h2>
     <form method="post" action="{% url 'add_comment' product.id %}">
       {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit">Submit Comment</button>
+      <label for="comment">Add a comment:</label>
+      <textarea name="comment" id="comment" rows="4" required></textarea>
+      <button type="submit">Post Comment</button>
     </form>
   {% else %}
-    <p>You must be logged in to leave a comment.</p>
+    <p>Please <a href="{% url 'login' %}">log in</a> to leave a comment.</p>
   {% endif %}
 
   <h3>Related Products</h3>

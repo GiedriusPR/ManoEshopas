@@ -265,9 +265,3 @@ a.btn-primary:hover {
   font-size: 18px;
   font-weight: bold;
 }
-
-.comment-profile-pic {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-}

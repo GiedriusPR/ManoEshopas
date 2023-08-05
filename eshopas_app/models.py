@@ -7,7 +7,7 @@ from imagekit.models import ImageSpecField
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
-from .image_processors import ResizeImageProcessor, ResizeProfilePictureinCommentProcessor, ResizeToFill
+from .image_processors import ResizeImageProcessor, ResizeToFill
 
 
 
@@ -83,16 +83,6 @@ class ProductComment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     comment = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
-    # Add an ImageField for the user's profile picture
-    profile_picture = models.ImageField(upload_to='comment_profile_pics', blank=True, null=True)
-
-    # Create a thumbnail of the user's profile picture with the ResizeProfilePictureinCommentProcessor
-    profile_thumbnail = ImageSpecField(
-        source='profile_picture',
-        processors=[ResizeProfilePictureinCommentProcessor],
-        format='JPEG',
-        options={'quality': 90}
-    )
 
 
 class Customer(models.Model):

@@ -45,9 +45,10 @@ class ProfileUpdateForm(forms.ModelForm):
         profile.save()
         return profile
 
-class ProductCommentForm(forms.Form):
-    comment = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}))
-
-    def save(self, user, product):
-        comment_text = self.cleaned_data['comment']
-        Comment.objects.create(user=user, product=product, comment=comment_text)
+class ProductCommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['comment']
+        widgets = {
+            'comment': forms.Textarea(attrs={'rows': 4}),
+        }
