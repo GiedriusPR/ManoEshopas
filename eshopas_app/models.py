@@ -1,4 +1,7 @@
+import uuid
+from django.conf import settings
 from django.db import models
+from django.contrib.auth.models import User
 from django.utils import timezone
 from PIL import Image
 import logging
@@ -6,7 +9,6 @@ from django.shortcuts import get_object_or_404
 from imagekit.models import ImageSpecField
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.models import User
 from .image_processors import ResizeImageProcessor, ResizeToFill
 
 
@@ -16,6 +18,7 @@ class Category(models.Model):
     name = models.CharField(max_length=100)
     type = models.SlugField(max_length=100, unique=True)
     description = models.TextField(blank=True)
+    pass
 
     def __str__(self):
         return self.name
@@ -86,12 +89,12 @@ class ProductComment(models.Model):
 
 
 class Customer(models.Model):
-    user = models.CharField(max_length=100)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     email = models.EmailField()
     product_id = models.IntegerField()
 
     def __str__(self):
-        return self.user
+        return self.user.username
 
 
 class ProductOrder(models.Model):
@@ -106,22 +109,58 @@ class ProductOrder(models.Model):
 class Review(models.Model):
     status = models.IntegerField()
     name = models.CharField(max_length=100)
-    order = models.ForeignKey(ProductOrder, on_delete=models.CASCADE, related_name='reviews', default=1)
+    order = models.ForeignKey('ProductOrder', on_delete=models.CASCADE, related_name='reviews', default=None)
     product_id = models.IntegerField()
     username = models.CharField(max_length=100)
     email = models.EmailField()
     review = models.TextField()
 
+    def save(self, *args, **kwargs):
+        if not self.order:  # Check if the order instance is not provided
+            # Set the default ProductOrder instance for reviews, assuming you have one with id=1
+            self.order = ProductOrder.objects.get(pk=1)
+        super().save(*args, **kwargs)
 
-class Orders(models.Model):
-    customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    string = models.CharField(max_length=100)
-    integer = models.IntegerField()
-    date = models.DateField()
-    status_id = models.IntegerField()
+
+class Status(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+
+    STATUS_CHOICES = (
+        ('Paid-Waiting', 'Paid-Waiting'),
+        ('Approved', 'Approved'),
+        ('OnDelivery', 'On Delivery'),
+        # Add other status choices as needed
+    )
+
+    status_type = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Paid-Waiting')
 
     def __str__(self):
-        return f"Order by {self.customer_id.user} - Status: {self.status_id}"
+        return self.status_type
+
+class Orders(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    status = models.ForeignKey(Status, default=1, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)
+    string = models.CharField(max_length=100)
+    integer = models.IntegerField(null=True)
+    date = models.DateField(auto_now_add=True)
+
+
+    def __str__(self):
+        return str(self.id)
+
+    def save(self, *args, **kwargs):
+        # Set the customer based on the authenticated user
+        if not self.customer and self.user.is_authenticated:
+            try:
+                self.customer = Customer.objects.get(user=self.user)
+            except Customer.DoesNotExist:
+                # Handle the case where the customer is not found
+                # You might want to create the customer here or display an error message
+                pass
+
+        super().save(*args, **kwargs)
 
 
 class User_login(models.Model):

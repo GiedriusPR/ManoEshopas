@@ -9,7 +9,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.decorators.http import require_POST
 from .models import (
-    Category, Product, Cart, Customer, ProductOrder, Review, Orders, User_login, ProductComment, CartItem, Comment
+    Category, Product, Cart, Customer, ProductOrder, Review, Orders, User_login, ProductComment, CartItem, Comment, Status
 )
 from .forms import (
     UserRegistrationForm, CartForm, UserUpdateForm, ProfileUpdateForm, ProductCommentForm, BillingAddressForm
@@ -119,50 +119,34 @@ def cart_count(request):
 
 @login_required
 def checkout_view(request):
-    try:
-        cart = Cart.objects.get(user=request.user)
-        cart_items = CartItem.objects.filter(cart=cart)
-        total_price = sum(item.product.price * item.quantity for item in cart_items)
+    if request.method == 'POST':
+        # Handle the form submission for the payment processing.
+        # You may integrate with the Stripe API here to handle the payment.
+        customer = Customer.objects.get(user=request.user)
+        order = Orders.objects.create(customer=customer, user=request.user)
+        # You can also add other details to the order like the total price, shipping address, etc.
 
-        if request.method == 'POST':
-            # Assuming you have the necessary form processing logic here for payment handling.
-            # After successful payment, create the order and pass the order_id to the 'order_success' page.
-            # For demonstration purposes, let's assume the payment is successful and an order is created.
+        return redirect('order_success', order_id=order.id)
 
-            # Replace the below lines with your actual payment processing logic.
-            # For example:
-            # order = create_order(request.user, cart_items, total_price)
-            # order_id = order.id
+    cart = Cart.objects.get(user=request.user)
+    cart_items = CartItem.objects.filter(cart=cart)
+    total_price = sum(item.product.price * item.quantity for item in cart_items)
 
-            order_id = 2  # Replace this with the actual order_id after creating the order.
-
-            # After successful payment and order creation, redirect to the 'order_success' page with the order_id.
-            return redirect('order_success', order_id=order_id)
-
-        context = {
-            'cart_items': cart_items,
-            'total_price': total_price,
-        }
-        return render(request, 'checkout.html', context)
-
-    except Cart.DoesNotExist:
-        return HttpResponse("Cart not found. Please create a cart.")
+    context = {
+        'cart_items': cart_items,
+        'total_price': total_price,
+    }
+    return render(request, 'checkout.html', context)
 
 
+@login_required
 def order_success(request, order_id):
-    try:
-        # Use the correct field 'order_id' for filtering the ProductOrder model.
-        order = ProductOrder.objects.get(order_id=order_id)
+    order = get_object_or_404(Orders, id=order_id, customer=request.user.customer)
 
-        # Add any other logic you need for displaying the order success page with the relevant order details.
-        context = {
-            'order': order,
-            # Add other context data as needed.
-        }
-        return render(request, 'order_success.html', context)
-
-    except ProductOrder.DoesNotExist:
-        return HttpResponse("Order not found.")
+    context = {
+        'order': order,
+    }
+    return render(request, 'order_success.html', context)
 
 
 def login_view(request):
@@ -219,19 +203,21 @@ def register_view(request):
 
 def product_list(request):
     try:
-        products = Product.objects.all()
+        products = Product.objects.order_by('name')
         logger.info(f'product_list view called, found {len(products)} products')
     except Exception as e:
         logger.error(f'Error fetching products: {e}')
         products = []
 
-    return render(request, 'products.html', {'products': products})
+    return render(request, 'product_list.html', {'products': products})
 
 @login_required
 def profile_view(request):
     if request.method == 'POST':
+        user_orders = None
         user_form = UserUpdateForm(request.POST, instance=request.user)
         profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        user_orders = Orders.objects.filter(user=request.user)
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
@@ -240,10 +226,12 @@ def profile_view(request):
     else:
         user_form = UserUpdateForm(instance=request.user)
         profile_form = ProfileUpdateForm(instance=request.user.profile)
+        user_orders = Orders.objects.filter(user=request.user)
 
     context = {
         'user_form': user_form,
         'profile_form': profile_form,
+        'orders': user_orders,
     }
 
     return render(request, 'profile.html', context)

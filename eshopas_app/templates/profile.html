@@ -1,4 +1,8 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load myfilters %}
+
+<link href="{% static 'css/styles.css' %}" rel="stylesheet">
 
 {% block content %}
   <div class="content-section">
@@ -39,5 +43,26 @@
         <button class="btn btn-primary" type="submit">Update</button>
       </div>
     </form>
+  </div>
+
+  <!-- My Orders section -->
+  <div class="container my-orders">
+    <h2>My Orders</h2>
+    {% if orders %}
+      <ul>
+        {% for order in orders %}
+          <li>
+            Order ID: {{ order.id }}
+            <br>
+            Status: {{ order.get_status_type_display }}  <!-- Use get_status_type_display -->
+            <br>
+            Date: {{ order.date }}
+            <!-- Add more order details as needed -->
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>You have no orders yet.</p>
+    {% endif %}
   </div>
 {% endblock %}
