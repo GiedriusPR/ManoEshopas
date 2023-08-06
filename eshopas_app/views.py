@@ -12,11 +12,12 @@ from .models import (
     Category, Product, Cart, Customer, ProductOrder, Review, Orders, User_login, ProductComment, CartItem, Comment
 )
 from .forms import (
-    UserRegistrationForm, CartForm, UserUpdateForm, ProfileUpdateForm, ProductCommentForm,
+    UserRegistrationForm, CartForm, UserUpdateForm, ProfileUpdateForm, ProductCommentForm, BillingAddressForm
 )
 from .templatetags.myfilters import cart_total
 from django.contrib import messages
 from PIL import Image
+from django.core.exceptions import ObjectDoesNotExist
 
 logger = logging.getLogger(__name__)
 
@@ -118,21 +119,50 @@ def cart_count(request):
 
 @login_required
 def checkout_view(request):
-    # Add logic here to handle the checkout process
-    # For example, calculate the total price, create orders, and process payment
-    if request.method == 'POST':
-        # Handle the form submission for checkout
-        # Process the order and redirect to order success page
-        pass  # Replace this with your logic for order processing
+    try:
+        cart = Cart.objects.get(user=request.user)
+        cart_items = CartItem.objects.filter(cart=cart)
+        total_price = sum(item.product.price * item.quantity for item in cart_items)
 
-    return render(request, 'checkout.html')
+        if request.method == 'POST':
+            # Assuming you have the necessary form processing logic here for payment handling.
+            # After successful payment, create the order and pass the order_id to the 'order_success' page.
+            # For demonstration purposes, let's assume the payment is successful and an order is created.
+
+            # Replace the below lines with your actual payment processing logic.
+            # For example:
+            # order = create_order(request.user, cart_items, total_price)
+            # order_id = order.id
+
+            order_id = 2  # Replace this with the actual order_id after creating the order.
+
+            # After successful payment and order creation, redirect to the 'order_success' page with the order_id.
+            return redirect('order_success', order_id=order_id)
+
+        context = {
+            'cart_items': cart_items,
+            'total_price': total_price,
+        }
+        return render(request, 'checkout.html', context)
+
+    except Cart.DoesNotExist:
+        return HttpResponse("Cart not found. Please create a cart.")
+
 
 def order_success(request, order_id):
-    order = get_object_or_404(Orders, id=order_id)
+    try:
+        # Use the correct field 'order_id' for filtering the ProductOrder model.
+        order = ProductOrder.objects.get(order_id=order_id)
 
-    # Add logic here to display order details and confirmation message
+        # Add any other logic you need for displaying the order success page with the relevant order details.
+        context = {
+            'order': order,
+            # Add other context data as needed.
+        }
+        return render(request, 'order_success.html', context)
 
-    return render(request, 'order_success.html', {'order': order})
+    except ProductOrder.DoesNotExist:
+        return HttpResponse("Order not found.")
 
 
 def login_view(request):
@@ -349,3 +379,28 @@ def my_favorites_view(request):
         'favorite_products': favorite_products
     }
     return render(request, 'my_favorites.html', context)
+
+
+def stripe_payment(request):
+    # Handle the payment processing using the Stripe API here.
+    # Create a Stripe payment intent and render the stripe_payment.html template.
+    # Handle the form submission and process the payment.
+    # If the payment is successful, redirect to the order success page.
+
+    return render(request, 'stripe_payment.html')
+
+
+def billing_address(request):
+    if request.method == 'POST':
+        form = BillingAddressForm(request.POST)
+        if form.is_valid():
+            # Save the billing address data to the database or session as needed
+            # For example, you can save it to the user's profile or the order instance.
+
+            # For demonstration purposes, let's assume we save the data in the session.
+            request.session['billing_address'] = form.cleaned_data
+            return redirect('stripe_payment')  # Redirect to the Stripe Payment Page
+    else:
+        form = BillingAddressForm()
+
+    return render(request, 'billing_address.html', {'form': form})

@@ -1,10 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Order Success</title>
-    <!-- Include CSS styles here -->
-</head>
-<body>
+{% extends 'base.html' %}
+{% load static %}
+{% load myfilters %}
+
+{% block title %}Order Success{% endblock %}
+
+{% block content %}
+<link href="{% static 'css/styles.css' %}" rel="stylesheet">
     <header>
         <!-- Header content -->
     </header>
@@ -28,5 +29,4 @@
 
     <!-- Add footer here -->
 
-</body>
-</html>
+{% endblock %}

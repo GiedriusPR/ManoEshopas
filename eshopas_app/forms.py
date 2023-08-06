@@ -52,3 +52,11 @@ class ProductCommentForm(forms.ModelForm):
         widgets = {
             'comment': forms.Textarea(attrs={'rows': 4}),
         }
+
+class BillingAddressForm(forms.Form):
+    full_name = forms.CharField(max_length=100, label='Full Name')
+    address_line1 = forms.CharField(max_length=255, label='Address Line 1')
+    address_line2 = forms.CharField(max_length=255, label='Address Line 2', required=False)
+    city_town = forms.CharField(max_length=100, label='City/Town')
+    postal_code = forms.CharField(max_length=10, label='Postal Code')
+    country = forms.CharField(max_length=100, label='Country')

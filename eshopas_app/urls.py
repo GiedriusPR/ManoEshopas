@@ -16,6 +16,8 @@ urlpatterns = [
     path('cart-count/', views.cart_count, name='cart_count'),
     path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('checkout/', views.checkout_view, name='checkout'),
+    path('billing_address/', views.billing_address, name='billing_address'),
+    path('stripe_payment/', views.stripe_payment, name='stripe_payment'),
     path('order_success/<int:order_id>/', views.order_success, name='order_success'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
@@ -26,6 +28,5 @@ urlpatterns = [
     path('update_quantity/<int:product_id>/', views.update_quantity, name='update_quantity'),
     path('remove_item/<int:product_id>/', views.remove_item, name='remove_item'),
     path('search/', views.search, name='search'),
-    # Include the authentication URLs once
     path('accounts/', include('django.contrib.auth.urls')),
 ]
