@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load myfilters %}
 
 <link href="{% static 'css/styles.css' %}" rel="stylesheet">
 
@@ -12,6 +13,7 @@
         <p class="text-secondary">{{ user.email }}</p>
       </div>
     </div>
+    <div><a class="btn btn-primary" href="{% url 'order_list' %}">My Orders</a></div>
     <form method="POST" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="form-group">
@@ -42,21 +44,5 @@
         <button class="btn btn-primary" type="submit">Update</button>
       </div>
     </form>
-  </div>
-
-  <!-- My Orders section -->
-  <div class="container my-orders">
-    {% if orders %}
-    <h2>My Orders</h2>
-    {% for order in orders %}
-        <div>
-            Order ID: {{ order.id }}
-            Customer: {{ order.customer.user.username }}
-            Status: {{ order.status }}
-        </div>
-    {% endfor %}
-    {% else %}
-      <p>You have no orders yet.</p>
-    {% endif %}
   </div>
 {% endblock %}

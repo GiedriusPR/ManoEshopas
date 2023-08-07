@@ -149,6 +149,17 @@ def order_success(request, order_id):
     return render(request, 'order_success.html', context)
 
 
+def order_list(request):
+    try:
+        customer = Customer.objects.get(user=request.user)
+        user_orders = Orders.objects.filter(customer=customer)
+    except Customer.DoesNotExist:
+        user_orders = None
+
+    context = {'orders': user_orders}
+    return render(request, 'order_list.html', context)
+
+
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
