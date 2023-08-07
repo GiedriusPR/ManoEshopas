@@ -213,20 +213,21 @@ def product_list(request):
 
 @login_required
 def profile_view(request):
+    user = request.user
+    user_orders = Orders.objects.filter(user=user)
+
     if request.method == 'POST':
-        user_orders = None
-        user_form = UserUpdateForm(request.POST, instance=request.user)
-        profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
-        user_orders = Orders.objects.filter(user=request.user)
+        user_form = UserUpdateForm(request.POST, instance=user)
+        profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=user.profile)
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
+            messages.success(request, 'Profile updated successfully.')
             return redirect('profile')  # Redirect to the profile page after successful update
     else:
-        user_form = UserUpdateForm(instance=request.user)
-        profile_form = ProfileUpdateForm(instance=request.user.profile)
-        user_orders = Orders.objects.filter(user=request.user)
+        user_form = UserUpdateForm(instance=user)
+        profile_form = ProfileUpdateForm(instance=user.profile)
 
     context = {
         'user_form': user_form,
@@ -235,6 +236,18 @@ def profile_view(request):
     }
 
     return render(request, 'profile.html', context)
+
+
+@login_required
+def order_detail_view(request, order_id):
+    order = get_object_or_404(Orders, id=order_id, user=request.user)
+    order_items = CartItem.objects.filter(cart__user=request.user, cart__order__id=order_id)
+
+    context = {
+        'order': order,
+        'order_items': order_items,
+    }
+    return render(request, 'order_detail.html', context)
 
 
 class CategoryListView(View):

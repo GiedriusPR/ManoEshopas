@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load myfilters %}
 
 <link href="{% static 'css/styles.css' %}" rel="stylesheet">
 
@@ -47,20 +46,15 @@
 
   <!-- My Orders section -->
   <div class="container my-orders">
-    <h2>My Orders</h2>
     {% if orders %}
-      <ul>
-        {% for order in orders %}
-          <li>
+    <h2>My Orders</h2>
+    {% for order in orders %}
+        <div>
             Order ID: {{ order.id }}
-            <br>
-            Status: {{ order.get_status_type_display }}  <!-- Use get_status_type_display -->
-            <br>
-            Date: {{ order.date }}
-            <!-- Add more order details as needed -->
-          </li>
-        {% endfor %}
-      </ul>
+            Customer: {{ order.customer.user.username }}
+            Status: {{ order.status }}
+        </div>
+    {% endfor %}
     {% else %}
       <p>You have no orders yet.</p>
     {% endif %}

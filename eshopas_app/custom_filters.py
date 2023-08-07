@@ -1,7 +1,6 @@
 from django import template
 from PIL import Image
 import os
-from .models import Products
 
 
 register = template.Library()

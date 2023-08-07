@@ -15,9 +15,11 @@
 
         <!-- Display order details and confirmation message -->
         <div class="order-details">
-            <p>Order ID: {{ order.order_id }}</p>
+            <p>Order ID: {{ order.id }}</p>  <!-- Use order.id to display the Order ID -->
             <p>Customer: {{ order.customer }}</p>
-            <!-- Add more order details as needed -->
+            <!-- Ensure order.status is used with get_status_type_display method -->
+            Status: {{ order.get_status_type_display }}
+
         </div>
 
         <!-- Display confirmation message -->

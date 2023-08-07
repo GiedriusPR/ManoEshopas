@@ -12,13 +12,10 @@ from django.dispatch import receiver
 from .image_processors import ResizeImageProcessor, ResizeToFill
 
 
-
-
 class Category(models.Model):
     name = models.CharField(max_length=100)
     type = models.SlugField(max_length=100, unique=True)
     description = models.TextField(blank=True)
-    pass
 
     def __str__(self):
         return self.name
@@ -138,6 +135,18 @@ class Status(models.Model):
     def __str__(self):
         return self.status_type
 
+
+class Order(models.Model):
+    # Your other fields for the Order model
+    STATUS_CHOICES = (
+        ('PENDING', 'Pending'),
+        ('SHIPPED', 'Shipped'),
+        ('DELIVERED', 'Delivered'),
+        # Add more choices as needed
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    # Your other fields and methods for the Order model
+
 class Orders(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     status = models.ForeignKey(Status, default=1, on_delete=models.CASCADE)
@@ -145,7 +154,6 @@ class Orders(models.Model):
     string = models.CharField(max_length=100)
     integer = models.IntegerField(null=True)
     date = models.DateField(auto_now_add=True)
-
 
     def __str__(self):
         return str(self.id)
@@ -175,12 +183,8 @@ class User_login(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     city_town = models.CharField(max_length=100, blank=True)
-    home_address = models.CharField(max_length=255, blank=True)  # Add this line
+    home_address = models.CharField(max_length=255, blank=True)
     img = models.ImageField(upload_to='profile_pics', default='default.jpg')
-    thumbnail = ImageSpecField(source='img',
-                               processors=[ResizeToFill(40, 40)],
-                               format='JPEG',
-                               options={'quality': 60})
 
     def __str__(self):
         return f'{self.user.username} Profile'
