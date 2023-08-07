@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load myfilters %}
+
+{% block title %}Order Success{% endblock %}
+
+{% block content %}
+<head>
+    <title>Order Details - Order ID: {{ order.order_id }}</title>
+</head>
+<body>
+    <h1>Order Details - Order ID: {{ order.order_id }}</h1>
+    <p><strong>Status:</strong> {{ order.status }}</p>
+    <p><strong>Customer:</strong> {{ order.customer.user.username }}</p>
+    <p><strong>Date:</strong> {{ order.date }}</p>
+
+    <h2>Ordered Items:</h2>
+    <ul>
+        {% for item in order.cartitem_set.all %}
+            <li>{{ item.product.name }} - Quantity: {{ item.quantity }} - Price: ${{ item.product.price }}</li>
+        {% endfor %}
+    </ul>
+
+    <p><strong>Total Amount:</strong> ${{ order.total_amount }}</p>
+    <!-- Add any other order details you want to display -->
+
+    <p><a href="{% url 'profile' %}">Back to Profile</a></p>
+    <p><a href="{% url 'order_list' %}">Back to Order List</a></p>
+</body>
+</html>
+{% endblock %}
