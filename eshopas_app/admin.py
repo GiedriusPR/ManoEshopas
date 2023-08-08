@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import Category, Product, Customer, ProductOrder, Review, Orders, User_login, Status
+from PIL import Image
+from django.utils.html import format_html
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -9,10 +11,14 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ['is_featured', 'category', 'stock']
 
     def image_tag(self, obj):
-        return f'<img src="{obj.thumbnail.url}" width="100" height="150" />'
-    image_tag.short_description = 'Thumbnail'
+        try:
+            img = Image.open(obj.thumbnail.path)
+            img.thumbnail((150, 200), Image.LANCZOS)  # Use Image.LANCZOS for resizing
+            return format_html('<img src="{}" />', img.url)
+        except:
+            return "Image not available"
 
-    fields = ['name', 'price', 'is_featured', 'category', 'stock', 'image', 'description']
+    image_tag.short_description = 'Thumbnail'
 
 
 

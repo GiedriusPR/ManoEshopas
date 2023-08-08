@@ -30,8 +30,6 @@ class Product(models.Model):
     thumbnail = ImageSpecField(source='image', processors=[ResizeToFill(150, 200)], format='JPEG', options={'quality': 90})
     is_featured = models.BooleanField(default=True)
     stock = models.PositiveIntegerField(default=0)
-    sales_discount = models.FloatField(default=0.0)
-    discount = models.FloatField(default=0.0)
     description = models.TextField(blank=True)
     favorites = models.ManyToManyField(User, related_name='favorites', blank=True)
 
