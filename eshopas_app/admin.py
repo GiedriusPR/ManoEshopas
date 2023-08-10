@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, Customer, ProductOrder, Review, Orders, User_login, Status
+from .models import Category, Product, Customer, Review, Orders, User_login, Status, ShippingAddress
 from PIL import Image
 from django.utils.html import format_html
 
@@ -9,6 +9,13 @@ class ProductAdmin(admin.ModelAdmin):
     list_display_links = ['name']
     search_fields = ['name', 'description']
     list_filter = ['is_featured', 'category', 'stock']
+
+
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('product', 'user', 'rating', 'date_posted', 'approved')
+    list_filter = ('approved')
+    search_fields = ('user__username', 'product__title')
+
 
     # def image_tag(self, obj):
     #     try:
@@ -26,7 +33,6 @@ class ProductAdmin(admin.ModelAdmin):
 admin.site.register(Category)
 admin.site.register(Customer)
 admin.site.register(Orders)
-admin.site.register(ProductOrder)
 admin.site.register(Review)
 admin.site.register(User_login)
 admin.site.register(Status)

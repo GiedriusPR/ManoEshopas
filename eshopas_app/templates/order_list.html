@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Orders</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}My Orders{% endblock %}
+
+{% block content %}
     <h1>My Orders</h1>
     {% if orders %}
     <ul>
@@ -12,13 +12,10 @@
                 Order ID: {{ order.id }}
                 Customer: {{ order.customer.user.username }}
                 Status: {{ order.status }}
-                <!-- Add any other order details you want to display -->
             </li>
         {% endfor %}
     </ul>
     {% else %}
         <p>You have no orders yet.</p>
     {% endif %}
-    <p><a href="{% url 'profile' %}">Back to Profile</a></p>
-</body>
-</html>
+{% endblock %}

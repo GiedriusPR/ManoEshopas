@@ -1,8 +1,8 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Product, Profile, Comment
+from .models import Product, Profile, Comment, Review
 from django import forms
-from PIL import Image
+import re
 
 class UserRegistrationForm(UserCreationForm):
     class Meta:
@@ -60,3 +60,45 @@ class BillingAddressForm(forms.Form):
     city_town = forms.CharField(max_length=100, label='City/Town')
     postal_code = forms.CharField(max_length=10, label='Postal Code')
     country = forms.CharField(max_length=100, label='Country')
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['rating', 'comment']  # Fields for the user to provide a rating and comment
+        widgets = {
+            'comment': forms.Textarea(attrs={'rows': 4}),
+        }
+
+
+class CreditCardForm(forms.Form):
+    card_number = forms.CharField(
+        label='Card Number',
+        widget=forms.TextInput(attrs={'placeholder': '*415458745868526'})
+    )
+    expiry_date = forms.CharField(
+        label='Expiry Date',
+        widget=forms.TextInput(attrs={'placeholder': '23/11'})
+    )
+    cvv = forms.CharField(
+        label='CVV',
+        widget=forms.TextInput(attrs={'placeholder': '123'})
+    )
+
+    def clean_card_number(self):
+        card_number = self.cleaned_data['card_number']
+        if not re.match(r'^\*\d{15}$', card_number):
+            raise forms.ValidationError('Card number must be in the format *415458745868526')
+        return card_number
+
+    def clean_expiry_date(self):
+        expiry_date = self.cleaned_data['expiry_date']
+        if not re.match(r'^\d{2}/\d{2}$', expiry_date):
+            raise forms.ValidationError('Expiry date must be in the format 23/11')
+        return expiry_date
+
+    def clean_cvv(self):
+        cvv = self.cleaned_data['cvv']
+        if not re.match(r'^\d{3}$', cvv):
+            raise forms.ValidationError('CVV must be 3 digits')
+        return cvv

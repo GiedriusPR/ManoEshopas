@@ -51,6 +51,11 @@ class Product(models.Model):
         except Exception as e:
             logger.exception(f"Failed to resize image for product {self.id}")
 
+    def avg_rating(self):
+        if self.reviews.exists():
+            return self.reviews.aggregate(models.Avg('rating'))['rating__avg']
+        return None
+
     def __str__(self):
         return self.name
 
@@ -86,7 +91,6 @@ class ProductComment(models.Model):
 class Customer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     email = models.EmailField()
-    product_id = models.IntegerField()
 
     def __str__(self):
         return self.user.username
@@ -102,19 +106,36 @@ class ProductOrder(models.Model):
 
 
 class Review(models.Model):
-    status = models.IntegerField()
-    name = models.CharField(max_length=100)
-    order = models.ForeignKey('ProductOrder', on_delete=models.CASCADE, related_name='reviews', default=None)
-    product_id = models.IntegerField()
+    order = models.ForeignKey('Orders', on_delete=models.CASCADE, related_name='reviews', default=None)
     username = models.CharField(max_length=100)
     email = models.EmailField()
-    review = models.TextField()
+    reviewed_product = models.ForeignKey(
+        Product,
+        related_name='reviews',
+        on_delete=models.CASCADE,
+        default=5  # Default value for reviewed_product
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        default=5  # Default value for user
+    )
+    rating = models.PositiveIntegerField(
+        choices=((1, '1 Star'), (2, '2 Stars'), (3, '3 Stars'), (4, '4 Stars'), (5, '5 Stars')),
+        default=5
+    )
+    comment = models.TextField(default="Default Comment")
+    date_posted = models.DateTimeField(default=timezone.now)
+    approved = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if not self.order:  # Check if the order instance is not provided
             # Set the default ProductOrder instance for reviews, assuming you have one with id=1
-            self.order = ProductOrder.objects.get(pk=1)
+            self.order = Orders.objects.get(pk=1)
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Review by {self.user.username} for {self.reviewed_product.name}"
 
 
 class Status(models.Model):
@@ -142,7 +163,8 @@ class Order(models.Model):
         ('DELIVERED', 'Delivered'),
         # Add more choices as needed
     )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    status = models.ForeignKey('eshopas_app.Status', on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, default=None)
     # Your other fields and methods for the Order model
 
 class Orders(models.Model):
@@ -152,9 +174,10 @@ class Orders(models.Model):
     string = models.CharField(max_length=100)
     integer = models.IntegerField(null=True)
     date = models.DateField(auto_now_add=True)
+    products = models.ManyToManyField(Product)
 
     def __str__(self):
-        return str(self.id)
+        return f"Order ID: {self.id} - Customer: {self.customer.user.username}"
 
     def save(self, *args, **kwargs):
         # Set the customer based on the authenticated user
@@ -204,3 +227,14 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user.username} on {self.product.name}"
+
+
+class ShippingAddress(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    address = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    zip_code = models.CharField(max_length=20)
+    country = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"Billing Address for {self.user.username}"

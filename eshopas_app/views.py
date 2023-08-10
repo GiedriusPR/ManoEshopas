@@ -4,22 +4,26 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.decorators.http import require_POST
 from .models import (
-    Category, Product, Cart, Customer, ProductOrder, Review, Orders, User_login, ProductComment, CartItem, Comment, Status
+    Category, Product, Cart, Customer, ProductOrder, Review, Orders, User_login, ProductComment, CartItem, Comment, Status,
+Order
 )
 from .forms import (
-    UserRegistrationForm, CartForm, UserUpdateForm, ProfileUpdateForm, ProductCommentForm, BillingAddressForm
+    UserRegistrationForm, CartForm, UserUpdateForm, ProfileUpdateForm, ProductCommentForm, BillingAddressForm,
+    ReviewForm, CreditCardForm
 )
 from .templatetags.myfilters import cart_total
 from django.contrib import messages
 from PIL import Image
 from django.core.exceptions import ObjectDoesNotExist
 
+
 logger = logging.getLogger(__name__)
+
 
 def index(request):
     products = Product.objects.all()
@@ -120,21 +124,30 @@ def cart_count(request):
 @login_required
 def checkout_view(request):
     if request.method == 'POST':
-        # Handle the form submission for the payment processing.
-        # You may integrate with the Stripe API here to handle the payment.
-        customer = Customer.objects.get(user=request.user)
-        order = Orders.objects.create(customer=customer, user=request.user)
-        # You can also add other details to the order like the total price, shipping address, etc.
+        form = CreditCardForm(request.POST)
+        if form.is_valid():
+            # Get the current user's customer record
+            customer = Customer.objects.get(user=request.user)
 
-        return redirect('order_success', order_id=order.id)
+            # Create a new order for the customer
+            order = Orders.objects.create(customer=customer, user=request.user)
+            # You can also add other details to the order like the total price, shipping address, etc.
 
+            return redirect('order_success', order_id=order.id)
+    else:
+        form = CreditCardForm()
+
+    # Retrieve the user's cart and cart items
     cart = Cart.objects.get(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart)
+
+    # Calculate the total price of the items in the cart
     total_price = sum(item.product.price * item.quantity for item in cart_items)
 
     context = {
         'cart_items': cart_items,
         'total_price': total_price,
+        'form': form,
     }
     return render(request, 'checkout.html', context)
 
@@ -148,7 +161,7 @@ def order_success(request, order_id):
     }
     return render(request, 'order_success.html', context)
 
-
+@login_required
 def order_list(request):
     try:
         customer = Customer.objects.get(user=request.user)
@@ -200,8 +213,11 @@ def register_view(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            print("Form is valid:", form.cleaned_data)
-            form.save()
+            user = form.save()  # Save the user object from the form
+
+            # Create a Customer instance and associate it with the new user
+            customer = Customer.objects.create(user=user)
+
             messages.success(request, 'Account created successfully. You can now log in.')
             return redirect('login')
         else:
@@ -393,15 +409,6 @@ def my_favorites_view(request):
     return render(request, 'my_favorites.html', context)
 
 
-def stripe_payment(request):
-    # Handle the payment processing using the Stripe API here.
-    # Create a Stripe payment intent and render the stripe_payment.html template.
-    # Handle the form submission and process the payment.
-    # If the payment is successful, redirect to the order success page.
-
-    return render(request, 'stripe_payment.html')
-
-
 def billing_address(request):
     if request.method == 'POST':
         form = BillingAddressForm(request.POST)
@@ -416,3 +423,50 @@ def billing_address(request):
         form = BillingAddressForm()
 
     return render(request, 'billing_address.html', {'form': form})
+
+
+@login_required
+def leave_review(request, product_id):
+    try:
+        product = Product.objects.get(pk=product_id)
+    except Product.DoesNotExist:
+        raise Http404("Product does not exist")
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.reviewed_product = product
+            review.user = request.user
+
+            # Fetch the latest order for the user
+            try:
+                customer = Customer.objects.get(user=request.user)
+                order = Order.objects.filter(customer=customer).latest('order_date')
+                review.order = order  # Assign the correct Order instance
+
+                review.save()
+
+                # Additional lines for creating a Review instance
+                Review.objects.create(
+                    status=('On Delivery'),  # Set the status as needed
+                    name=request.user.username,
+                    order=order,  # Assign the correct Order instance
+                    username=request.user.username,
+                    email=request.user.email,
+                    reviewed_product=product,
+                    user=request.user,
+                    rating=5,  # Set the rating as needed
+                    comment="Default Comment",  # Set the comment as needed
+                )
+
+                return redirect('product_detail', product_id=product_id)
+            except Customer.DoesNotExist:
+                # Handle the case where the customer doesn't exist for this user
+                pass
+
+    else:
+        form = ReviewForm()
+
+    context = {'form': form, 'product': product}
+    return render(request, 'leave_review.html', context)
