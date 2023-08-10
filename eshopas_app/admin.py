@@ -5,20 +5,20 @@ from django.utils.html import format_html
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price', 'is_featured', 'category', 'stock', 'image_tag', 'description']
+    list_display = ['name', 'price', 'is_featured', 'category', 'stock', 'description']
     list_display_links = ['name']
     search_fields = ['name', 'description']
     list_filter = ['is_featured', 'category', 'stock']
 
-    def image_tag(self, obj):
-        try:
-            img = Image.open(obj.thumbnail.path)
-            img.thumbnail((150, 200), Image.LANCZOS)  # Use Image.LANCZOS for resizing
-            return format_html('<img src="{}" />', img.url)
-        except:
-            return "Image not available"
-
-    image_tag.short_description = 'Thumbnail'
+    # def image_tag(self, obj):
+    #     try:
+    #         # img = Image.open(obj.thumbnail.path)
+    #         img.thumbnail((150, 200), Image.LANCZOS)  # Use Image.LANCZOS for resizing
+    #         return format_html('<img src="{}" />', img.url)
+    #     except:
+    #         return "Image not available"
+    #
+    # image_tag.short_description = 'Thumbnail'
 
 
 
