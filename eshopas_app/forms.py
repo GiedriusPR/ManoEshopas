@@ -4,18 +4,22 @@ from .models import Product, Profile, Comment, Review
 from django import forms
 import re
 
+
 class UserRegistrationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'password1', 'password2']
 
+
 class CartForm(forms.Form):
     product_id = forms.IntegerField(widget=forms.HiddenInput())
+
 
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = '__all__'
+
 
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField()
@@ -23,6 +27,7 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['email', 'first_name', 'last_name']
+
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
@@ -45,13 +50,15 @@ class ProfileUpdateForm(forms.ModelForm):
         profile.save()
         return profile
 
+
 class ProductCommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['comment']
         widgets = {
-            'comment': forms.Textarea(attrs={'rows': 4}),
+            'comment': forms.Textarea(attrs={'rows': 3}),
         }
+
 
 class BillingAddressForm(forms.Form):
     full_name = forms.CharField(max_length=100, label='Full Name')

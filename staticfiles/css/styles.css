@@ -193,22 +193,18 @@ img {
   max-height: 200px;
 }
 
-/* Add this for h2 */
 h2 {
   font-size: 24px;
 }
 
-/* Add this for h3 */
 h3 {
   font-size: 24px;
 }
 
-/* Add this for p */
 p {
   font-size: 20px;
 }
 
-/* Add this for buttons */
 button {
   font-size: 18px;
   padding: 10px 20px;
@@ -217,7 +213,6 @@ button {
   cursor: pointer;
 }
 
-/* Style the favorite item button */
 a.favorite-item {
   font-size: 24px;
   text-decoration: none;
@@ -228,7 +223,6 @@ a.favorite-item.favorite {
   color: red;
 }
 
-/* Style the back to main page button */
 a.btn-primary {
   font-size: 20px;
   margin-top: 20px;
@@ -243,7 +237,6 @@ a.btn-primary:hover {
   background-color: #0056b3;
 }
 
-/* Style the related product container */
 .related-products {
   display: flex;
   flex-wrap: wrap;

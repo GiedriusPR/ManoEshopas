@@ -48,20 +48,6 @@
     <p>Please <a href="{% url 'login' %}">log in</a> to leave a comment.</p>
   {% endif %}
 
-  <h3>Related Products</h3>
-  <div class="related-products">
-    {% for related_product in related_products %}
-      <div class="related-product">
-        <h4>{{ related_product.name }}</h4>
-        <p>Price: ${{ related_product.price }}</p>
-        <a href="{% url 'product_detail' related_product.id %}">View Details</a>
-      </div>
-    {% endfor %}
-  </div>
-    <h2>{{ product.title }}</h2>
-    <p>{{ product.description }}</p>
-    <p>Price: {{ product.price }}</p>
-
 <!-- Display Average Rating -->
     <p>Average Rating: {{ product.avg_rating }}</p>
 
@@ -81,6 +67,18 @@
     <button type="submit">Submit Review</button>
     </form>
 
-  <!-- Back to Main Page button -->
-  <a href="{% url 'index' %}" class="btn btn-primary">Back to Main Page</a>
+  <h3>Related Products</h3>
+  <div class="related-products">
+    {% for related_product in related_products %}
+      <div class="related-product">
+        <h4>{{ related_product.name }}</h4>
+        <p>Price: ${{ related_product.price }}</p>
+        <a href="{% url 'product_detail' related_product.id %}">View Details</a>
+      </div>
+    {% endfor %}
+  </div>
+    <h2>{{ product.title }}</h2>
+    <p>{{ product.description }}</p>
+    <p>Price: {{ product.price }}</p>
+
 {% endblock %}
