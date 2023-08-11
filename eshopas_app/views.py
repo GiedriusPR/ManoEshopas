@@ -9,7 +9,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.decorators.http import require_POST
 from .models import (
-    Category, Product, Cart, Customer, ProductOrder, Review, Orders, User_login, ProductComment, CartItem, Comment, Status,
+    Category, Product, Cart, Customer, ProductOrder, Review, User_login, ProductComment, CartItem, Comment, Status,
 Order
 )
 from .forms import (
@@ -130,7 +130,8 @@ def checkout_view(request):
             customer = Customer.objects.get(user=request.user)
 
             # Create a new order for the customer
-            order = Orders.objects.create(customer=customer, user=request.user)
+            initial_status = Status.objects.get(status_type='Paid-Waiting')
+            order = Order.objects.create(customer=customer, status=initial_status)
             # You can also add other details to the order like the total price, shipping address, etc.
 
             return redirect('order_success', order_id=order.id)
@@ -154,7 +155,7 @@ def checkout_view(request):
 
 @login_required
 def order_success(request, order_id):
-    order = get_object_or_404(Orders, id=order_id, customer=request.user.customer)
+    order = get_object_or_404(Order, id=order_id, customer=request.user.customer)
 
     context = {
         'order': order,
@@ -165,11 +166,11 @@ def order_success(request, order_id):
 def order_list(request):
     try:
         customer = Customer.objects.get(user=request.user)
-        user_orders = Orders.objects.filter(customer=customer)
+        user_orders = Order.objects.filter(customer=customer)
     except Customer.DoesNotExist:
         user_orders = None
 
-    context = {'orders': user_orders}
+    context = {'orders': user_orders}  # Update the key to 'orders' to match the template variable
     return render(request, 'order_list.html', context)
 
 
@@ -238,10 +239,11 @@ def product_list(request):
 
     return render(request, 'product_list.html', {'products': products})
 
+
 @login_required
 def profile_view(request):
     user = request.user
-    user_orders = Orders.objects.filter(user=user)
+    user_orders = Order.objects.filter(customer__user=user)
 
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=user)
@@ -259,7 +261,7 @@ def profile_view(request):
     context = {
         'user_form': user_form,
         'profile_form': profile_form,
-        'orders': user_orders,
+        'order': user_orders,
     }
 
     return render(request, 'profile.html', context)
@@ -267,12 +269,20 @@ def profile_view(request):
 
 @login_required
 def order_detail_view(request, order_id):
-    order = get_object_or_404(Orders, id=order_id, user=request.user)
-    order_items = CartItem.objects.filter(cart__user=request.user, cart__order__id=order_id)
+    try:
+        # Retrieve the order associated with the provided order_id and the current user
+        order = get_object_or_404(Order, id=order_id, customer__user=request.user)
+        order_items = order.products.all()  # Retrieve the ordered products using the related name
+        total_price = sum(item.price for item in order_items)
+    except Order.DoesNotExist:
+        order = get_product_by_id
+        order_items = CartItem
+        total_price = enumerate
 
     context = {
         'order': order,
         'order_items': order_items,
+        'total_price': total_price,
     }
     return render(request, 'order_detail.html', context)
 
@@ -409,20 +419,19 @@ def my_favorites_view(request):
     return render(request, 'my_favorites.html', context)
 
 
+@login_required()
 def billing_address(request):
     if request.method == 'POST':
-        form = BillingAddressForm(request.POST)
-        if form.is_valid():
-            # Save the billing address data to the database or session as needed
-            # For example, you can save it to the user's profile or the order instance.
+        # Process the billing address and create the order
+        # ...
 
-            # For demonstration purposes, let's assume we save the data in the session.
-            request.session['billing_address'] = form.cleaned_data
-            return redirect('stripe_payment')  # Redirect to the Stripe Payment Page
-    else:
-        form = BillingAddressForm()
+        # After processing, create the order and set is_approved=False
+        # ... add other order details ...
 
-    return render(request, 'billing_address.html', {'form': form})
+        # Redirect to the order completed page
+        return redirect('order_completed')
+
+    return render(request, 'billing_address.html')
 
 
 @login_required
@@ -432,41 +441,29 @@ def leave_review(request, product_id):
     except Product.DoesNotExist:
         raise Http404("Product does not exist")
 
-    if request.method == 'POST':
+    try:
+        customer = Customer.objects.get(user=request.user)
+        order = Order.objects.get(customer=request.user.customer, products__id=product_id, is_approved=True)
+        is_order_approved = True
+    except (Customer.DoesNotExist, Order.DoesNotExist):
+        is_order_approved = False
+
+    if request.method == 'POST' and is_order_approved:
         form = ReviewForm(request.POST)
         if form.is_valid():
             review = form.save(commit=False)
             review.reviewed_product = product
             review.user = request.user
+            review.order = order
+            review.save()
 
-            # Fetch the latest order for the user
-            try:
-                customer = Customer.objects.get(user=request.user)
-                order = Order.objects.filter(customer=customer).latest('order_date')
-                review.order = order  # Assign the correct Order instance
-
-                review.save()
-
-                # Additional lines for creating a Review instance
-                Review.objects.create(
-                    status=('On Delivery'),  # Set the status as needed
-                    name=request.user.username,
-                    order=order,  # Assign the correct Order instance
-                    username=request.user.username,
-                    email=request.user.email,
-                    reviewed_product=product,
-                    user=request.user,
-                    rating=5,  # Set the rating as needed
-                    comment="Default Comment",  # Set the comment as needed
-                )
-
-                return redirect('product_detail', product_id=product_id)
-            except Customer.DoesNotExist:
-                # Handle the case where the customer doesn't exist for this user
-                pass
-
+            return redirect('product_detail', product_id=product_id)
     else:
         form = ReviewForm()
 
-    context = {'form': form, 'product': product}
+    context = {'form': form, 'product': product, 'is_order_approved': is_order_approved}
     return render(request, 'leave_review.html', context)
+
+
+def order_completed(request):
+    return render(request, 'order_completed.html')

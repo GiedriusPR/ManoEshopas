@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, Customer, Review, Orders, User_login, Status, ShippingAddress
+from .models import Category, Product, Customer, Review, Order, User_login, Status, ShippingAddress
 from PIL import Image
 from django.utils.html import format_html
 
@@ -32,7 +32,7 @@ class ReviewAdmin(admin.ModelAdmin):
 # Register the rest of the models
 admin.site.register(Category)
 admin.site.register(Customer)
-admin.site.register(Orders)
+admin.site.register(Order)
 admin.site.register(Review)
 admin.site.register(User_login)
 admin.site.register(Status)

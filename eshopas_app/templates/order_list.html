@@ -11,7 +11,8 @@
             <li>
                 Order ID: {{ order.id }}
                 Customer: {{ order.customer.user.username }}
-                Status: {{ order.status }}
+                Status: {{ order.status.status_type }} {# Display the status_type attribute from the related Status model #}
+                <a href="{% url 'order_detail' order_id=order.id %}">View Details</a>
             </li>
         {% endfor %}
     </ul>

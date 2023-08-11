@@ -29,6 +29,12 @@
 
     </div>
 
-    <!-- Add footer here -->
+        <div class="container">
+            <h2>Order Successfully Placed</h2>
+            <p>Your order with Order ID: {{ order_id }} has been placed successfully.</p>
+            <p>Thank you for shopping with us!</p>
+
+            <a href="{% url 'billing_address' %}" class="btn btn-primary">Continue to Payment</a>
+        </div>
 
 {% endblock %}

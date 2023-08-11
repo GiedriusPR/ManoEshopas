@@ -2,10 +2,14 @@
 
 {% block content %}
   <h2>Leave a Review</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+  {% if is_order_approved %}
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
 
-    <button type="submit">Submit Review</button>
-  </form>
+      <button type="submit">Submit Review</button>
+    </form>
+  {% else %}
+    <p>You can only leave a review for approved orders.</p>
+  {% endif %}
 {% endblock %}

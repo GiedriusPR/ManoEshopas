@@ -106,7 +106,7 @@ class ProductOrder(models.Model):
 
 
 class Review(models.Model):
-    order = models.ForeignKey('Orders', on_delete=models.CASCADE, related_name='reviews', default=None)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='reviews', default=None)
     username = models.CharField(max_length=100)
     email = models.EmailField()
     reviewed_product = models.ForeignKey(
@@ -156,40 +156,20 @@ class Status(models.Model):
 
 
 class Order(models.Model):
-    # Your other fields for the Order model
     STATUS_CHOICES = (
-        ('PENDING', 'Pending'),
-        ('SHIPPED', 'Shipped'),
-        ('DELIVERED', 'Delivered'),
-        # Add more choices as needed
+        ('Paid-Waiting', 'Paid-Waiting'),
+        ('Approved', 'Approved'),
+        ('OnDelivery', 'On Delivery'),
+        # Add other status choices as needed
     )
-    status = models.ForeignKey('eshopas_app.Status', on_delete=models.CASCADE)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, default=None)
-    # Your other fields and methods for the Order model
 
-class Orders(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    status = models.ForeignKey(Status, default=1, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)
-    string = models.CharField(max_length=100)
-    integer = models.IntegerField(null=True)
-    date = models.DateField(auto_now_add=True)
-    products = models.ManyToManyField(Product)
+    status = models.ForeignKey('Status', on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, default=None)
+    products = models.ManyToManyField(Product)  # This line associates products with the order
+    is_approved = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Order ID: {self.id} - Customer: {self.customer.user.username}"
-
-    def save(self, *args, **kwargs):
-        # Set the customer based on the authenticated user
-        if not self.customer and self.user.is_authenticated:
-            try:
-                self.customer = Customer.objects.get(user=self.user)
-            except Customer.DoesNotExist:
-                # Handle the case where the customer is not found
-                # You might want to create the customer here or display an error message
-                pass
-
-        super().save(*args, **kwargs)
 
 
 class User_login(models.Model):

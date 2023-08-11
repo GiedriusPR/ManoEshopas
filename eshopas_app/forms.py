@@ -69,6 +69,14 @@ class ReviewForm(forms.ModelForm):
         widgets = {
             'comment': forms.Textarea(attrs={'rows': 4}),
         }
+        labels = {
+            'rating': 'Rating',  # You can customize labels here
+            'comment': 'Comment',
+        }
+        help_texts = {
+            'rating': 'Select a rating from 1 to 5.',
+            'comment': 'Provide your comments here.',
+        }
 
 
 class CreditCardForm(forms.Form):
