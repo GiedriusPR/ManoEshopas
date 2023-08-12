@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
+{% load cart_tags %}
 {% load myfilters %}
 
 <html lang="en">
@@ -24,20 +25,28 @@
                 <a class="nav-item nav-link btn btn-primary" href="/category/">Categories</a>
                 {% if user.is_authenticated %}
                     <a class="nav-item nav-link btn btn-primary" href="/profile/">Profile</a>
-                    <a class="nav-item nav-link btn btn-primary" href="/my-favorites/">My Favorites</a> <!-- New link for My Favorites -->
+                    <a class="nav-item nav-link btn btn-primary" href="/my-favorites/">My Favorites</a>
                     <a class="nav-item nav-link btn btn-primary" href="/logout/">Logout</a>
+                    {% if request.user.cart %}
+                        <a class="nav-item nav-link btn btn-primary cart-link" href="/cart-detail/">
+                            Cart ({{ request.user.cart.cartitem_set.count }})
+                        </a>
+                    {% else %}
+                        <a class="nav-item nav-link btn btn-primary cart-link" href="/cart-detail/">
+                            Cart (0)
+                        </a>
+                    {% endif %}
                 {% else %}
                     <a class="nav-item nav-link btn btn-primary" href="{% url 'login' %}">Login</a>
                     <a class="nav-item nav-link btn btn-primary" href="/register/">Register</a>
                 {% endif %}
-                <a class="nav-item nav-link btn btn-primary" href="/cart-detail/">Cart ({{ request.session.cart|cart_total }})</a>
             </div>
         </div>
     </div>
 </nav>
-    <div class="container">
-      {% block content %}
-      {% endblock %}
-    </div>
+<div class="container">
+    {% block content %}
+    {% endblock %}
+</div>
 </body>
 </html>

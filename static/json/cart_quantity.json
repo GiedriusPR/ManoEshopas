@@ -1,0 +1,3 @@
+{
+    "cart_quantity": {{ request.session.cart|cart_total }}
+}

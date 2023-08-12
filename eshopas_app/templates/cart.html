@@ -14,7 +14,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for item in cart_items %}
+            {% for item in cart.cartitem_set.all %}
                 <tr>
                     <td>{{ item.product.name }}</td>
                     <td>{{ item.quantity }}</td>
@@ -23,4 +23,10 @@
             {% endfor %}
         </tbody>
     </table>
+    {% if cart.cartitem_set.all %}
+        <p>Total Cart Value: ${{ cart.get_cart_total }}</p>
+        <a href="{% url 'checkout' %}" class="btn btn-primary">Proceed to Checkout</a>
+    {% else %}
+        <p>Your cart is empty.</p>
+    {% endif %}
 {% endblock %}

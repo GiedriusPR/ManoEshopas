@@ -7,11 +7,15 @@ CART_SESSION_KEY = getattr(settings, 'CART_SESSION_KEY', 'cart')
 
 class Cart:
     def __init__(self, request):
+        self.cart_items = None
         self.session = request.session
         cart = self.session.get(CART_SESSION_KEY)
         if not cart:
             cart = self.session[CART_SESSION_KEY] = {}
         self.cart = cart
+
+    def get_total_quantity(self):
+        return sum(item.quantity for item in self.cart_items.all())
 
 
     def add(self, product, quantity=1, update_quantity=False):

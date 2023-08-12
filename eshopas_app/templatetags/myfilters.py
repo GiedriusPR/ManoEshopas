@@ -4,23 +4,18 @@ import json
 
 register = template.Library()
 
-@register.filter
-def multiply(value, arg):
-    return value * arg
 
 @register.filter
 def multiply(value, arg):
     return value * arg
 
+
 @register.filter
-def cart_total(cart):
-    if not cart:
-        return 0
+def multiply(value, arg):
+    return value * arg
 
-    try:
-        cart = json.loads(cart)
-    except (json.JSONDecodeError, TypeError):
-        return 0
 
-    total_quantity = sum(int(details['quantity']) for product_id, details in cart.items())
-    return total_quantity
+# @register.filter(name='cart_total_quantity')
+# def cart_total_quantity(cart):
+#     total_quantity = sum(item['quantity'] for item in cart)
+#     return total_quantity

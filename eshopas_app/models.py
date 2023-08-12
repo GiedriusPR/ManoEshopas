@@ -67,9 +67,17 @@ class Cart(models.Model):
         return f"Cart for {self.user.username}"
 
     def update_quantity(self, product_id, new_quantity):
-        cart_item = get_object_or_404(CartItem, cart=self, product_id=product_id)
+        cart_item = self.cartitem_set.get(product_id=product_id)
         cart_item.quantity = new_quantity
         cart_item.save()
+
+
+@receiver(post_save, sender=User)
+def create_or_update_user_cart(sender, instance, created, **kwargs):
+    if created:
+        Cart.objects.create(user=instance)
+    else:
+        instance.cart.save()
 
 
 class CartItem(models.Model):

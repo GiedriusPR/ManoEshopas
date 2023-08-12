@@ -16,7 +16,6 @@ from .forms import (
     UserRegistrationForm, CartForm, UserUpdateForm, ProfileUpdateForm, ProductCommentForm, BillingAddressForm,
     ReviewForm, CreditCardForm
 )
-from .templatetags.myfilters import cart_total
 from django.contrib import messages
 from PIL import Image
 from django.core.exceptions import ObjectDoesNotExist
@@ -39,10 +38,13 @@ def index(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    # Count the number of items in the cart
+    cart_items_count = len(cart_items)
+
     context = {
         'products': page_obj,
         'categories': categories,
-        'cart_items_count': len(cart_items),  # Update the cart count here
+        'cart_items_count': cart_items_count,
         'total_cart_value': total_cart_value,
         'user': request.user,
     }
