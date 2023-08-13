@@ -41,3 +41,11 @@ My E-Shop is licensed under the MIT License. See `LICENSE` for more information.
 
 
 ![Homepage](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/home.png)
+
+![ProductDetail](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/productdetail.png)
+
+![Checkout](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/checkout.png)
+
+![Category](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/category.png)
+
+![Profile](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/profile.png)https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/profile.png)
