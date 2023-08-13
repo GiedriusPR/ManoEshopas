@@ -38,3 +38,6 @@ Contributions to My E-Shop are welcome! Feel free to open an issue or create a p
 ## License
 
 My E-Shop is licensed under the MIT License. See `LICENSE` for more information.
+
+
+![Homepage](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/home.png)
