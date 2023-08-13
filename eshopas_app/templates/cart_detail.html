@@ -9,7 +9,6 @@
         <thead>
             <tr>
                 <th>Product</th>
-                <th>Quantity</th>
                 <th>Price</th>
                 <th>Total</th>
                 <th>Actions</th>
@@ -19,13 +18,6 @@
             {% for item in cart_items %}
                 <tr>
                     <td>{{ item.product.name }}</td>
-                    <td>
-                        <form method="post" action="{% url 'update_quantity' item.product.id %}">
-                            {% csrf_token %}
-                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
-                            <button type="submit">Update</button>
-                        </form>
-                    </td>
                     <td>${{ item.product.price }}</td>
                     <td>${{ item.total_price }}</td>
                     <td>

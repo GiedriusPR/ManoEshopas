@@ -90,6 +90,7 @@ class CartItem(models.Model):
         return self.product.price * self.quantity
 
 
+
 class ProductComment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     comment = models.TextField()
@@ -139,7 +140,7 @@ class Review(models.Model):
     def save(self, *args, **kwargs):
         if not self.order:  # Check if the order instance is not provided
             # Set the default ProductOrder instance for reviews, assuming you have one with id=1
-            self.order = Orders.objects.get(pk=1)
+            self.order = Order.objects.get(pk=1)
         super().save(*args, **kwargs)
 
     def __str__(self):
