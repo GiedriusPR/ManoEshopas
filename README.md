@@ -52,4 +52,4 @@ My E-Shop is licensed under the MIT License. See `LICENSE` for more information.
 
 ![Category](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/category.png)
 
-![Profile](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/profile.png)https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/profile.png)
+![Profile](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/profile.png)
