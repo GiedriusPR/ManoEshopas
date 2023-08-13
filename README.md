@@ -14,6 +14,9 @@ Some of the main features of My E-Shop include:
 - Featured products on the homepage
 - Shopping cart functionality
 - Checkout process
+- Add comment about product
+- Review Order Leave with rating
+- Search by name, description
 
 ## Setup and Installation
 
@@ -30,6 +33,7 @@ source venv/bin/activate
 5.Run the development server: python manage.py runserver
 
 6. Open a web browser and navigate to `http://localhost:8000/` to see the application in action.
+7. Open a web browser and navigate to `http://localhost:8000/admin` to see admin page, approve orders, see reviews, add products and more.
 
 ## Contributing
 
@@ -38,3 +42,14 @@ Contributions to My E-Shop are welcome! Feel free to open an issue or create a p
 ## License
 
 My E-Shop is licensed under the MIT License. See `LICENSE` for more information.
+
+
+![Homepage](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/home.png)
+
+![ProductDetail](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/productdetail.png)
+
+![Checkout](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/checkout.png)
+
+![Category](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/category.png)
+
+![Profile](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/profile.png)
