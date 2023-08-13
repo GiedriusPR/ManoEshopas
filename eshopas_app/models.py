@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from imagekit.models import ImageSpecField
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .image_processors import ResizeImageProcessor, ResizeToFill
+from .image_processors import ResizeImageProcessor, ResizeToFill, resize_image
 
 
 class Category(models.Model):
