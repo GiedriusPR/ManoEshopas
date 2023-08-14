@@ -48,6 +48,8 @@ My E-Shop is licensed under the MIT License. See `LICENSE` for more information.
 
 ![ProductDetail](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/productdetail.png)
 
+My Contacts: giedriuspranevicius@inbox.lt
+
 ![Checkout](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/checkout.png)
 
 ![Category](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/category.png)
