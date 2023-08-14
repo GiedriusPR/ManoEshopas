@@ -9,7 +9,7 @@ My E-Shop is a Django-based e-commerce web application that lets users browse pr
 Some of the main features of My E-Shop include:
 
 - User authentication (login, logout, and register functionality)
-- User profiles with profile picture support
+- User profiles with profile picture
 - Browsing products by category
 - Featured products on the homepage
 - Shopping cart functionality
