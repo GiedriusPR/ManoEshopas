@@ -43,12 +43,13 @@ Contributions to My E-Shop are welcome! Feel free to open an issue or create a p
 
 My E-Shop is licensed under the MIT License. See `LICENSE` for more information.
 
+My Contacts: 
+giedriuspranevicius@inbox.lt
+
 
 ![Homepage](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/home.png)
 
 ![ProductDetail](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/productdetail.png)
-
-My Contacts: giedriuspranevicius@inbox.lt
 
 ![Checkout](https://github.com/GiedriusPR/ManoEshopas/blob/main/thelook/checkout.png)
 
